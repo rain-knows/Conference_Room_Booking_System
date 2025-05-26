@@ -102,9 +102,9 @@ Conference_Room_Booking_System/
 ├── lib/                    # 项目依赖库 (注意：此列表中的 .xml 文件为 IntelliJ IDEA 库配置文件，实际的 .jar 文件需确保已正确配置或存放于此目录)
 │   ├── IntelliJ_IDEA_GridLayout.xml # IntelliJ IDEA 项目库配置文件，定义了 GUI 设计器 GridLayoutManager 所需的运行时库 (通常是 IDEA 自带的 forms_rt.jar 或类似名称的库)
 │   ├── MigLayout.xml                # IntelliJ IDEA 项目库配置文件，定义了 MigLayout 布局管理器库 (通常指向 miglayout-swing.jar，需确保该 JAR 文件实际存在于项目中或由 IDE 管理)
-│   ├── mysql_connector_j_8_0_33.xml # MySQL JDBC驱动定义 (指向 mysql-connector-j-8.0_33.jar)
+│   ├── mysql_connector_j_8_0_33.xml # MySQL JDBC驱动定义 (指向 mysql-connector-j-8.0.33.jar)
 │   ├── intellij_forms_rt_src.zip    # IntelliJ IDEA GUI 设计器运行时库的源码压缩包，主要用于查阅参考，并非直接编译或运行所必需的依赖
-│   └── mysql-connector-j-8.0_33.jar # MySQL JDBC 驱动 (实际的jar文件应在此或由 .xml 文件引用)
+│   └── mysql-connector-j-8.0.33.jar # MySQL JDBC 驱动 (实际的jar文件应在此或由 .xml 文件引用)
 ├── src/                    # Java 源代码
 │   ├── LoginForm.java      # 用户登录界面及主程序入口
 │   ├── UserDAO.java        # 用户数据访问对象，处理用户相关的数据库操作
