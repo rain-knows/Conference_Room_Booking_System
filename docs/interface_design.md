@@ -28,7 +28,7 @@
 
 ### 3.1 登录界面
 
-![登录界面示意图](../assets/images/login_ui.png)
+![登录界面示意图](.\image\img.png)
 
 **界面元素**：
 - 系统标题
