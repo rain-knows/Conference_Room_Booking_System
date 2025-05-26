@@ -91,7 +91,7 @@
 
 ## 项目结构
 
-
+```
 Conference_Room_Booking_System/
 ├── .idea/                  # IntelliJ IDEA 项目配置文件
 ├── docs/                   # 设计文档和数据库脚本
@@ -110,7 +110,7 @@ Conference_Room_Booking_System/
 │   ├── UserDAO.java        # 用户数据访问对象，处理用户相关的数据库操作
 │   └── ...                 # 其他核心 Java 类或包 (例如：会议室管理界面 AdminDashboard.java、预订处理逻辑 BookingManager.java、工具类 Utils.java 等，建议具体列出主要的包名或类名以增强项目结构清晰度)
 └── Conference_Room_Booking_System.iml # IntelliJ IDEA 模块文件
-
+```
 
 ## 使用说明
 
