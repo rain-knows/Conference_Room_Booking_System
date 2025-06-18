@@ -1,10 +1,10 @@
 // filepath: d:\code\java_code\jform\src\UserDAO.java
 import java.sql.*;
 
-public class UserDAO {
+public class    UserDAO {
     // 数据库连接信息
-    private static final String URL = "jdbc:mysql://117.72.60.69:3306/rainknows";
-    private static final String USER = "rainknows";
+    private static final String URL = "jdbc:mysql://117.72.60.69:3306/metting";
+    private static final String USER = "metting";
     private static final String PASSWORD = "rainknows";
 
     // 获取数据库连接
@@ -33,7 +33,7 @@ public class UserDAO {
         try {
             conn = getConnection();
             // 查询用户表验证用户名和密码
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT * FROM user WHERE username = ? AND password = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);

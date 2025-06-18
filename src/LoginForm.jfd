@@ -10,10 +10,13 @@ new FormModel {
 				name: "label1"
 				"text": "请登录"
 				"font": new java.awt.Font( "华文中宋", 0, 24 )
+				"horizontalAlignment": 0
+				"horizontalTextPosition": 0
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 234
-				"width": 126
+				"x": 185
+				"width": 150
 				"height": 128
+				"y": 5
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "label2"
@@ -22,9 +25,10 @@ new FormModel {
 				"horizontalAlignment": 0
 				"font": new java.awt.Font( "Microsoft YaHei UI", 0, 14 )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"y": 133
-				"width": 229
-				"height": 62
+				"y": 145
+				"width": 100
+				"height": 50
+				"x": 65
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "label3"
@@ -33,17 +37,18 @@ new FormModel {
 				"horizontalAlignment": 0
 				"horizontalTextPosition": 0
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"y": 200
-				"width": 229
-				"height": 82
+				"y": 215
+				"width": 100
+				"height": 50
+				"x": 65
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "nameControl"
 				"columns": 20
 				"action": sfield com.jformdesigner.model.FormObject NULL_VALUE
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 225
-				"y": 145
+				"x": 220
+				"y": 150
 				"width": 200
 				"height": 40
 			} )
@@ -61,13 +66,13 @@ new FormModel {
 				"text": "登录"
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button1", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 234
-				"y": 287
-				"width": 126
-				"height": 122
+				"x": 200
+				"y": 310
+				"width": 140
+				"height": 59
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 255, 200 )
+			"location": new java.awt.Point( 40, 30 )
 			"size": new java.awt.Dimension( 525, 440 )
 		} )
 	}
