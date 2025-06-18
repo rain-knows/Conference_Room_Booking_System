@@ -19,7 +19,7 @@ public class LoginForm extends JFrame {
         // 设置窗口初始大小
         setSize(600, 450);
 
-        // 加载JDBC驱动程序
+        // 加载JDBC驱动程序1
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
