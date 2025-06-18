@@ -4,7 +4,6 @@ import javax.swing.*;
 import com.intellij.uiDesigner.core.*;
 import net.miginfocom.swing.*;
 import java.sql.SQLException;
-import org.jdesktop.swingx.*;
 /*
  * Created by JFormDesigner on Thu May 15 10:30:24 CST 2025
  */
@@ -72,7 +71,7 @@ public class LoginForm extends JFrame {
         label1.setText("\u8bf7\u767b\u5f55");
         label1.setFont(new Font("\u534e\u6587\u4e2d\u5b8b", Font.PLAIN, 24));
         contentPane.add(label1);
-        label1.setBounds(new Rectangle(new Point(283, 39), label1.getPreferredSize()));
+        label1.setBounds(234, 0, 126, 128);
 
         //---- label2 ----
         label2.setText("\u8d26\u53f7");
@@ -80,28 +79,32 @@ public class LoginForm extends JFrame {
         label2.setHorizontalAlignment(SwingConstants.CENTER);
         label2.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 14));
         contentPane.add(label2);
-        label2.setBounds(130, 155, 65, 35);
+        label2.setBounds(0, 133, 229, 62);
 
         //---- label3 ----
         label3.setText("\u5bc6\u7801");
+        label3.setFont(label3.getFont().deriveFont(label3.getFont().getStyle() | Font.BOLD));
+        label3.setHorizontalAlignment(SwingConstants.CENTER);
+        label3.setHorizontalTextPosition(SwingConstants.CENTER);
         contentPane.add(label3);
-        label3.setBounds(140, 260, 100, 39);
+        label3.setBounds(0, 200, 229, 82);
 
         //---- nameControl ----
         nameControl.setColumns(20);
+        nameControl.setAction(null);
         contentPane.add(nameControl);
-        nameControl.setBounds(new Rectangle(new Point(390, 148), nameControl.getPreferredSize()));
+        nameControl.setBounds(225, 145, 200, 40);
 
         //---- passControl ----
         passControl.setColumns(20);
         contentPane.add(passControl);
-        passControl.setBounds(new Rectangle(new Point(390, 260), passControl.getPreferredSize()));
+        passControl.setBounds(220, 220, 200, 40);
 
         //---- loginbutton ----
         loginbutton.setText("\u767b\u5f55");
         loginbutton.addActionListener(e -> button1(e));
         contentPane.add(loginbutton);
-        loginbutton.setBounds(new Rectangle(new Point(295, 350), loginbutton.getPreferredSize()));
+        loginbutton.setBounds(234, 287, 126, 122);
 
         {
             // compute preferred size

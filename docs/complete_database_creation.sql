@@ -1,8 +1,6 @@
 -- 会议室预约管理系统数据库创建脚本
 -- 创建日期：2025-05-26
 
--- 使用数据库rainknows（假设该数据库已存在）
-USE rainknows;
 
 -- 删除表（如果存在）以避免冲突，按照依赖关系的逆序删除
 DROP TABLE IF EXISTS SystemLog;
