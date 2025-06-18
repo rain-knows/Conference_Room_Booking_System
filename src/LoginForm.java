@@ -70,8 +70,10 @@ public class LoginForm extends JFrame {
         //---- label1 ----
         label1.setText("\u8bf7\u767b\u5f55");
         label1.setFont(new Font("\u534e\u6587\u4e2d\u5b8b", Font.PLAIN, 24));
+        label1.setHorizontalAlignment(SwingConstants.CENTER);
+        label1.setHorizontalTextPosition(SwingConstants.CENTER);
         contentPane.add(label1);
-        label1.setBounds(234, 0, 126, 128);
+        label1.setBounds(185, 5, 150, 128);
 
         //---- label2 ----
         label2.setText("\u8d26\u53f7");
@@ -79,7 +81,7 @@ public class LoginForm extends JFrame {
         label2.setHorizontalAlignment(SwingConstants.CENTER);
         label2.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 14));
         contentPane.add(label2);
-        label2.setBounds(0, 133, 229, 62);
+        label2.setBounds(65, 145, 100, 50);
 
         //---- label3 ----
         label3.setText("\u5bc6\u7801");
@@ -87,13 +89,13 @@ public class LoginForm extends JFrame {
         label3.setHorizontalAlignment(SwingConstants.CENTER);
         label3.setHorizontalTextPosition(SwingConstants.CENTER);
         contentPane.add(label3);
-        label3.setBounds(0, 200, 229, 82);
+        label3.setBounds(65, 215, 100, 50);
 
         //---- nameControl ----
         nameControl.setColumns(20);
         nameControl.setAction(null);
         contentPane.add(nameControl);
-        nameControl.setBounds(225, 145, 200, 40);
+        nameControl.setBounds(220, 150, 200, 40);
 
         //---- passControl ----
         passControl.setColumns(20);
@@ -104,7 +106,7 @@ public class LoginForm extends JFrame {
         loginbutton.setText("\u767b\u5f55");
         loginbutton.addActionListener(e -> button1(e));
         contentPane.add(loginbutton);
-        loginbutton.setBounds(234, 287, 126, 122);
+        loginbutton.setBounds(200, 310, 140, 59);
 
         {
             // compute preferred size
