@@ -69,16 +69,6 @@ CREATE TABLE Reservation (
     FOREIGN KEY (roomId) REFERENCES MeetingRoom(roomId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约表';
 
--- 预约参与者表
-CREATE TABLE ReservationParticipant (
-    reservationId INT,                 -- 预约ID
-    userId INT,                        -- 参与者用户ID
-    confirmed BOOLEAN,                 -- 是否确认参加
-    PRIMARY KEY (reservationId, userId),-- 复合主键
-    FOREIGN KEY (reservationId) REFERENCES Reservation(reservationId) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES `User`(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约参与者表';
-
 -- 插入基础数据
 
 -- 1. 插入会议室类型数据
@@ -101,5 +91,3 @@ INSERT INTO MeetingRoom (name, location, capacity, status, description, roomType
 INSERT INTO Equipment (roomId, name, model, status, purchaseDate) VALUES
 (2, '投影仪', 'Model-XYZ', 1, '2023-01-15'),
 (2, '视频会议系统', 'VC-2000', 1, '2023-02-20');
-
-
