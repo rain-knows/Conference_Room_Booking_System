@@ -57,10 +57,10 @@ public class LoginForm extends JFrame {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         label1 = new JLabel();
         label2 = new JLabel();
-        label3 = new JLabel();
         nameControl = new JTextField();
         passControl = new JPasswordField();
         loginbutton = new JButton();
+        label4 = new JLabel();
 
         //======== this ========
         setFont(new Font("Microsoft JhengHei UI", Font.PLAIN, 16));
@@ -83,14 +83,6 @@ public class LoginForm extends JFrame {
         contentPane.add(label2);
         label2.setBounds(65, 145, 100, 50);
 
-        //---- label3 ----
-        label3.setText("\u5bc6\u7801");
-        label3.setFont(label3.getFont().deriveFont(label3.getFont().getStyle() | Font.BOLD));
-        label3.setHorizontalAlignment(SwingConstants.CENTER);
-        label3.setHorizontalTextPosition(SwingConstants.CENTER);
-        contentPane.add(label3);
-        label3.setBounds(65, 215, 100, 50);
-
         //---- nameControl ----
         nameControl.setColumns(20);
         nameControl.setAction(null);
@@ -107,6 +99,14 @@ public class LoginForm extends JFrame {
         loginbutton.addActionListener(e -> button1(e));
         contentPane.add(loginbutton);
         loginbutton.setBounds(200, 310, 140, 59);
+
+        //---- label4 ----
+        label4.setText("\u5bc6\u7801");
+        label4.setHorizontalTextPosition(SwingConstants.CENTER);
+        label4.setHorizontalAlignment(SwingConstants.CENTER);
+        label4.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 14));
+        contentPane.add(label4);
+        label4.setBounds(70, 220, 100, 50);
 
         {
             // compute preferred size
@@ -130,10 +130,10 @@ public class LoginForm extends JFrame {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel label1;
     private JLabel label2;
-    private JLabel label3;
     private JTextField nameControl;
     private JPasswordField passControl;
     private JButton loginbutton;
+    private JLabel label4;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
 
