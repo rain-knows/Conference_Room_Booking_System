@@ -10,7 +10,7 @@
 
 1.  **用户管理模块**：User
 2.  **会议室管理模块**：MeetingRoom, Equipment, RoomType
-3.  **预约管理模块**：Reservation, ReservationParticipant
+3.  **预约管理模块**：Reservation
 
 ## 3. 表结构详情
 
@@ -96,19 +96,6 @@ CREATE TABLE Reservation (
 ) ENGINE=InnoDB;
 ```
 
-#### ReservationParticipant 表
-会议参与者关联表。
-```
-CREATE TABLE ReservationParticipant (
-    reservationId INT,                 -- 预约ID
-    userId INT,                        -- 参与者用户ID
-    confirmed BOOLEAN,                 -- 是否确认参加
-    PRIMARY KEY (reservationId, userId),-- 复合主键
-    FOREIGN KEY (reservationId) REFERENCES Reservation(reservationId),
-    FOREIGN KEY (userId) REFERENCES `User`(userId)
-) ENGINE=InnoDB;
-```
-
 ### 3.4 实体关系说明
 
 #### 3.4.1 用户授权关系
@@ -121,7 +108,6 @@ CREATE TABLE ReservationParticipant (
 #### 3.4.3 预约关系
 - **用户**可以创建多个会议室**预约**
 - 一个**预约**涉及一个特定的**会议室**
-- 多个**用户**可以参与一个**预约**（通过ReservationParticipant表）
 
 ## 4. 数据库优化建议
 
