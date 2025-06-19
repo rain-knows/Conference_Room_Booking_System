@@ -3,8 +3,8 @@ import java.sql.*;
 
 public class    UserDAO {
     // 数据库连接信息
-    private static final String URL = "jdbc:mysql://117.72.60.69:3306/metting";
-    private static final String USER = "metting";
+    private static final String URL = "jdbc:mysql://117.72.60.69:3306/conference_room_booking";
+    private static final String USER = "conference_room_booking";
     private static final String PASSWORD = "rainknows";
 
     // 获取数据库连接
