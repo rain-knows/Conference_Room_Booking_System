@@ -69,25 +69,3 @@ CREATE TABLE Reservation (
     FOREIGN KEY (roomId) REFERENCES MeetingRoom(roomId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约表';
 
--- 插入基础数据
-
--- 1. 插入会议室类型数据
-INSERT INTO RoomType (typeName, typeCode, description) VALUES
-('普通会议室', 'NORMAL', '基础设施的会议室，适合一般会议使用'),
-('高级会议室', 'ADVANCED', '配备高级设备（如视频会议系统）的会议室');
-
--- 2. 插入用户数据
-INSERT INTO `User` (username, password, fullName, email, phone, role, active) VALUES
-('admin', 'admin_password', '系统管理员', 'admin@example.com', '1234567890', 'SYSTEM_ADMIN', TRUE),
-('leader', 'leader_password', '部门领导', 'leader@example.com', '0987654321', 'LEADER', TRUE),
-('employee', 'employee_password', '普通员工', 'employee@example.com', '1122334455', 'NORMAL_EMPLOYEE', TRUE);
-
--- 3. 插入会议室数据
-INSERT INTO MeetingRoom (name, location, capacity, status, description, roomTypeId) VALUES
-('101会议室', '一楼东侧', 10, 1, '普通会议室', 1),
-('201会议室', '二楼西侧', 20, 1, '高级会议室，配备投影仪', 2);
-
--- 4. 插入设备数据
-INSERT INTO Equipment (roomId, name, model, status, purchaseDate) VALUES
-(2, '投影仪', 'Model-XYZ', 1, '2023-01-15'),
-(2, '视频会议系统', 'VC-2000', 1, '2023-02-20');

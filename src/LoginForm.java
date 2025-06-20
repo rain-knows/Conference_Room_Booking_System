@@ -1,14 +1,13 @@
 import java.awt.*;
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import com.intellij.uiDesigner.core.*;
+import javax.swing.border.*;
 import net.miginfocom.swing.*;
 import java.sql.SQLException;
 /*
  * Created by JFormDesigner on Thu May 15 10:30:24 CST 2025
  */
-
-
 
 /**
  * @author JUSTLIKEZYP
@@ -17,7 +16,43 @@ public class LoginForm extends JFrame {
     public LoginForm() {
         initComponents();
         // 设置窗口初始大小
-        setSize(600, 450);
+        setSize(500, 400);
+        setLocationRelativeTo(null);
+        // 设置主背景色
+        getContentPane().setBackground(new Color(245, 248, 252));
+        // 美化按钮
+        loginbutton.setBackground(new Color(52, 152, 219));
+        loginbutton.setForeground(Color.WHITE);
+        loginbutton.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        loginbutton.setFocusPainted(false);
+        loginbutton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        // 按钮悬停变色
+        loginbutton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                loginbutton.setBackground(new Color(41, 128, 185));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                loginbutton.setBackground(new Color(52, 152, 219));
+            }
+        });
+        // 绑定登录按钮点击事件
+        loginbutton.addActionListener(e -> button1(e));
+        // 输入框圆角和边框
+        nameControl.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        passControl.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        nameControl.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+        passControl.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+        // 标题字体
+        label1.setFont(new Font("微软雅黑", Font.BOLD, 28));
+        label1.setForeground(new Color(52, 73, 94));
+        // 标签字体
+        label2.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+        label4.setFont(new Font("微软雅黑", Font.PLAIN, 16));
 
         // 加载JDBC驱动程序1
         try {
@@ -40,10 +75,13 @@ public class LoginForm extends JFrame {
         try {
             // 调用DAO进行验证
             UserDAO userDAO = new UserDAO();
-            boolean success = userDAO.checkLogin(username, password);
-            if (success) {
+            User user = userDAO.checkLogin(username, password);
+            if (user != null) {
                 JOptionPane.showMessageDialog(this, "登录成功", "成功", JOptionPane.INFORMATION_MESSAGE);
-                // TODO: 登录成功后的操作，例如打开主界面等
+                // 登录成功后的操作，打开主界面
+                MainPage mainPage = new MainPage(user);
+                mainPage.setVisible(true);
+                this.dispose(); // 关闭登录窗口
             } else {
                 JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
             }
@@ -122,7 +160,7 @@ public class LoginForm extends JFrame {
             contentPane.setMinimumSize(preferredSize);
             contentPane.setPreferredSize(preferredSize);
         }
-        pack();
+        setSize(525, 440);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
@@ -136,10 +174,9 @@ public class LoginForm extends JFrame {
     private JLabel label4;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
-
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(()->{
-            LoginForm loginForm=new LoginForm();
+        SwingUtilities.invokeLater(() -> {
+            LoginForm loginForm = new LoginForm();
             loginForm.setVisible(true);
         });
     }
