@@ -38,10 +38,11 @@ public class UserProfilePanel extends JPanel {
 
     private void initComponents() {
         setLayout(new MigLayout("fillx, insets 30 50 30 50", "[grow,fill]", "[]20[]20[]"));
+        UIStyleUtil.setMainBackground(this);
 
         // 主标题
         JLabel titleLabel = new JLabel("个人信息");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 24));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         add(titleLabel, "span, center, wrap");
 
         JPanel mainPanel = new JPanel(new MigLayout("fillx, insets 0", "[grow,fill][grow,fill]", "[grow]"));
@@ -50,36 +51,36 @@ public class UserProfilePanel extends JPanel {
         // --- Profile Information Panel ---
         JPanel profilePanel = new JPanel(new MigLayout("wrap 2, fillx", "[100px][grow, fill]"));
         profilePanel.setBorder(
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
-                        "基本信息", 0, 0, new Font("微软雅黑", Font.BOLD, 16)));
+                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 1, true),
+                        "基本信息", 0, 0, new Font("微软雅黑", Font.BOLD, 18), new Color(41, 128, 185)));
+        profilePanel.setBackground(Color.WHITE);
 
         JLabel usernameLabel = new JLabel("用户名:");
-        usernameLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyLabel(usernameLabel);
         usernameField = new JTextField();
-        usernameField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyTextField(usernameField);
         usernameField.setEditable(false);
         profilePanel.add(usernameLabel);
         profilePanel.add(usernameField, "growx");
 
         JLabel emailLabel = new JLabel("邮箱:");
-        emailLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyLabel(emailLabel);
         emailField = new JTextField();
-        emailField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyTextField(emailField);
         profilePanel.add(emailLabel);
         profilePanel.add(emailField, "growx");
 
         JLabel phoneLabel = new JLabel("电话:");
-        phoneLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyLabel(phoneLabel);
         phoneField = new JTextField();
-        phoneField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyTextField(phoneField);
         profilePanel.add(phoneLabel);
         profilePanel.add(phoneField, "growx");
 
         saveProfileButton = new JButton("保存更改");
+        UIStyleUtil.beautifyButton(saveProfileButton);
         JButton resetProfileButton = new JButton("重置");
-        saveProfileButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        resetProfileButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        UIStyleUtil.beautifyButton(resetProfileButton);
         saveProfileButton.addActionListener(e -> saveProfileChanges());
         resetProfileButton.addActionListener(e -> populateUserData());
         profilePanel.add(saveProfileButton, "align right, gaptop 10");
@@ -88,33 +89,33 @@ public class UserProfilePanel extends JPanel {
         // --- Change Password Panel ---
         JPanel passwordPanel = new JPanel(new MigLayout("wrap 2, fillx", "[100px][grow, fill]"));
         passwordPanel.setBorder(
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
-                        "修改密码", 0, 0, new Font("微软雅黑", Font.BOLD, 16)));
+                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 1, true),
+                        "修改密码", 0, 0, new Font("微软雅黑", Font.BOLD, 18), new Color(41, 128, 185)));
+        passwordPanel.setBackground(Color.WHITE);
 
         JLabel oldPwdLabel = new JLabel("旧密码:");
-        oldPwdLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyLabel(oldPwdLabel);
         oldPasswordField = new JPasswordField();
-        oldPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyPasswordField(oldPasswordField);
         passwordPanel.add(oldPwdLabel);
         passwordPanel.add(oldPasswordField, "growx");
 
         JLabel newPwdLabel = new JLabel("新密码:");
-        newPwdLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyLabel(newPwdLabel);
         newPasswordField = new JPasswordField();
-        newPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyPasswordField(newPasswordField);
         passwordPanel.add(newPwdLabel);
         passwordPanel.add(newPasswordField, "growx");
 
         JLabel confirmPwdLabel = new JLabel("确认新密码:");
-        confirmPwdLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyLabel(confirmPwdLabel);
         confirmPasswordField = new JPasswordField();
-        confirmPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyPasswordField(confirmPasswordField);
         passwordPanel.add(confirmPwdLabel);
         passwordPanel.add(confirmPasswordField, "growx");
 
         changePasswordButton = new JButton("确认修改密码");
-        changePasswordButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        UIStyleUtil.beautifyButton(changePasswordButton);
         changePasswordButton.addActionListener(e -> changePassword());
         passwordPanel.add(changePasswordButton, "span 2, align right, gaptop 10");
 

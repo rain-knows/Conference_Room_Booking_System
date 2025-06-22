@@ -51,6 +51,7 @@ public class AdminSettingsPanel extends JPanel {
 
     private void initComponents() {
         setLayout(new MigLayout("fill, insets 20", "[grow]", "[grow]"));
+        setBackground(new Color(245, 248, 252));
 
         // 创建选项卡面板
         tabbedPane = new JTabbedPane();
@@ -75,44 +76,48 @@ public class AdminSettingsPanel extends JPanel {
         JPanel panel = new JPanel(new MigLayout("wrap 2, fillx, insets 20", "[120px][grow,fill]"));
 
         JLabel titleLabel = new JLabel("更改管理员密码");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         panel.add(titleLabel, "span 2, wrap, gapbottom 20");
 
         JLabel userLabel = new JLabel("当前用户名:");
-        userLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        userLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
         JLabel usernameLabel = new JLabel(currentUser.getUsername());
-        usernameLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        usernameLabel.setFont(new Font("微软雅黑", Font.PLAIN, 18));
         panel.add(userLabel);
         panel.add(usernameLabel, "wrap, gapbottom 10");
 
         oldPasswordField = new JPasswordField();
         newPasswordField = new JPasswordField();
         confirmPasswordField = new JPasswordField();
-
-        oldPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        newPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        confirmPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        UIStyleUtil.beautifyPasswordField(oldPasswordField);
+        UIStyleUtil.beautifyPasswordField(newPasswordField);
+        UIStyleUtil.beautifyPasswordField(confirmPasswordField);
+        oldPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 18));
+        newPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 18));
+        confirmPasswordField.setFont(new Font("微软雅黑", Font.PLAIN, 18));
 
         JLabel oldPwdLabel = new JLabel("旧密码:");
-        oldPwdLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        oldPwdLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
         panel.add(oldPwdLabel);
         panel.add(oldPasswordField, "growx, wrap");
 
         JLabel newPwdLabel = new JLabel("新密码:");
-        newPwdLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        newPwdLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
         panel.add(newPwdLabel);
         panel.add(newPasswordField, "growx, wrap");
 
         JLabel confirmPwdLabel = new JLabel("确认新密码:");
-        confirmPwdLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        confirmPwdLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
         panel.add(confirmPwdLabel);
         panel.add(confirmPasswordField, "growx, wrap, gapbottom 20");
 
         savePasswordButton = new JButton("保存更改");
-        savePasswordButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        UIStyleUtil.beautifyButton(savePasswordButton);
+        savePasswordButton.setFont(new Font("微软雅黑", Font.BOLD, 20));
         savePasswordButton.addActionListener(e -> savePasswordChanges());
         panel.add(savePasswordButton, "span 2, align right");
 
+        UIStyleUtil.setMainBackground(panel);
         return panel;
     }
 
@@ -121,14 +126,12 @@ public class AdminSettingsPanel extends JPanel {
 
         // 标题
         JLabel titleLabel = new JLabel("权限映射管理");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         panel.add(titleLabel, "wrap, gapbottom 20");
 
         // 权限表格
         String[] columnNames = { "ID", "用户角色", "会议室类型", "可预订", "可查看", "可管理", "描述", "创建时间" };
         permissionTable = new JTable(new javax.swing.table.DefaultTableModel(columnNames, 0));
-        permissionTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        permissionTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
         permissionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(permissionTable);
         panel.add(scrollPane, "grow, wrap, gapbottom 10");
@@ -142,11 +145,10 @@ public class AdminSettingsPanel extends JPanel {
         deletePermissionButton = new JButton("删除权限");
         initializeDefaultsButton = new JButton("初始化默认权限");
 
-        JButton[] buttons = { addPermissionButton, editPermissionButton, deletePermissionButton,
-                initializeDefaultsButton };
-        for (JButton btn : buttons) {
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        }
+        UIStyleUtil.beautifyButton(addPermissionButton);
+        UIStyleUtil.beautifyButton(editPermissionButton);
+        UIStyleUtil.beautifyButton(deletePermissionButton);
+        UIStyleUtil.beautifyButton(initializeDefaultsButton);
 
         addPermissionButton.addActionListener(e -> addPermission());
         editPermissionButton.addActionListener(e -> editPermission());
@@ -160,6 +162,7 @@ public class AdminSettingsPanel extends JPanel {
 
         panel.add(buttonPanel, "growx");
 
+        UIStyleUtil.setMainBackground(panel);
         return panel;
     }
 
@@ -168,14 +171,12 @@ public class AdminSettingsPanel extends JPanel {
 
         // 标题
         JLabel titleLabel = new JLabel("会议室类型管理");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         panel.add(titleLabel, "wrap, gapbottom 20");
 
         // 会议室类型表格
         String[] columnNames = { "ID", "类型名称", "类型代码", "描述", "创建时间", "更新时间" };
         roomTypeTable = new JTable(new javax.swing.table.DefaultTableModel(columnNames, 0));
-        roomTypeTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        roomTypeTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
         roomTypeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(roomTypeTable);
         panel.add(scrollPane, "grow, wrap, gapbottom 10");
@@ -188,10 +189,9 @@ public class AdminSettingsPanel extends JPanel {
         editRoomTypeButton = new JButton("编辑类型");
         deleteRoomTypeButton = new JButton("删除类型");
 
-        JButton[] buttons = { addRoomTypeButton, editRoomTypeButton, deleteRoomTypeButton };
-        for (JButton btn : buttons) {
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        }
+        UIStyleUtil.beautifyButton(addRoomTypeButton);
+        UIStyleUtil.beautifyButton(editRoomTypeButton);
+        UIStyleUtil.beautifyButton(deleteRoomTypeButton);
 
         addRoomTypeButton.addActionListener(e -> addRoomType());
         editRoomTypeButton.addActionListener(e -> editRoomType());
@@ -203,6 +203,7 @@ public class AdminSettingsPanel extends JPanel {
 
         panel.add(buttonPanel, "growx");
 
+        UIStyleUtil.setMainBackground(panel);
         return panel;
     }
 
@@ -210,59 +211,86 @@ public class AdminSettingsPanel extends JPanel {
         JPanel panel = new JPanel(new MigLayout("wrap 2, fillx, insets 20", "[120px][grow,fill]"));
 
         JLabel titleLabel = new JLabel("主题设置");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         panel.add(titleLabel, "span 2, wrap, gapbottom 20");
 
         JLabel currentThemeLabel = new JLabel("当前主题:");
-        currentThemeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        currentThemeLabel.setFont(new Font("微软雅黑", Font.BOLD, 16));
         panel.add(currentThemeLabel);
 
         JLabel currentThemeValue = new JLabel(UIStyleUtil.getCurrentTheme().getDisplayName());
-        currentThemeValue.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        currentThemeValue.setFont(new Font("微软雅黑", Font.PLAIN, 16));
         panel.add(currentThemeValue, "wrap, gapbottom 20");
 
         JLabel themeLabel = new JLabel("选择主题:");
-        themeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        themeLabel.setFont(new Font("微软雅黑", Font.BOLD, 16));
         panel.add(themeLabel);
 
         JComboBox<UIStyleUtil.ThemeType> themeComboBox = new JComboBox<>(UIStyleUtil.ThemeType.values());
-        themeComboBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         themeComboBox.setSelectedItem(UIStyleUtil.getCurrentTheme());
-        themeComboBox.addActionListener(e -> {
-            UIStyleUtil.ThemeType selectedTheme = (UIStyleUtil.ThemeType) themeComboBox.getSelectedItem();
-            if (selectedTheme != null) {
-                UIStyleUtil.applyTheme(selectedTheme);
-                currentThemeValue.setText(selectedTheme.getDisplayName());
-            }
-        });
+        themeComboBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         panel.add(themeComboBox, "growx, wrap, gapbottom 20");
 
         JLabel fontLabel = new JLabel("字体设置:");
-        fontLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        fontLabel.setFont(new Font("微软雅黑", Font.BOLD, 16));
         panel.add(fontLabel);
 
         JPanel fontPanel = new JPanel(new MigLayout("", "[][][]", "[]"));
         fontPanel.setOpaque(false);
 
-        JLabel fontSizeLabel = new JLabel("字体大小:");
-        fontSizeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        JComboBox<String> fontComboBox = new JComboBox<>(new String[] { "微软雅黑", "宋体", "黑体", "Arial", "Tahoma" });
+        fontComboBox.setSelectedItem("微软雅黑");
+        fontComboBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
 
         JSpinner fontSizeSpinner = new JSpinner(new SpinnerNumberModel(14, 10, 20, 1));
         fontSizeSpinner.setFont(new Font("微软雅黑", Font.PLAIN, 14));
 
         JButton applyFontButton = new JButton("应用字体");
-        applyFontButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        UIStyleUtil.beautifyButton(applyFontButton);
         applyFontButton.addActionListener(e -> {
-            int fontSize = (Integer) fontSizeSpinner.getValue();
-            UIStyleUtil.setGlobalFont("微软雅黑", fontSize);
+            String selectedFont = (String) fontComboBox.getSelectedItem();
+            int selectedSize = (Integer) fontSizeSpinner.getValue();
+            UIStyleUtil.setGlobalFont(selectedFont, selectedSize);
+            JOptionPane.showMessageDialog(this, "字体设置已应用！", "成功", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        fontPanel.add(fontSizeLabel);
+        fontPanel.add(new JLabel("字体:"));
+        fontPanel.add(fontComboBox);
+        fontPanel.add(new JLabel("大小:"));
         fontPanel.add(fontSizeSpinner);
         fontPanel.add(applyFontButton);
 
-        panel.add(fontPanel, "growx");
+        panel.add(fontPanel, "growx, wrap, gapbottom 20");
 
+        JButton applyThemeButton = new JButton("应用主题");
+        UIStyleUtil.beautifyButton(applyThemeButton);
+        applyThemeButton.setFont(new Font("微软雅黑", Font.BOLD, 16));
+        applyThemeButton.addActionListener(e -> {
+            UIStyleUtil.ThemeType selectedTheme = (UIStyleUtil.ThemeType) themeComboBox.getSelectedItem();
+            if (UIStyleUtil.applyTheme(selectedTheme)) {
+                currentThemeValue.setText(selectedTheme.getDisplayName());
+                JOptionPane.showMessageDialog(this, "主题已成功应用！", "成功", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "主题应用失败！", "错误", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton resetButton = new JButton("重置为默认");
+        UIStyleUtil.beautifyButton(resetButton);
+        resetButton.setFont(new Font("微软雅黑", Font.BOLD, 16));
+        resetButton.addActionListener(e -> {
+            UIStyleUtil.initializeUI();
+            themeComboBox.setSelectedItem(UIStyleUtil.getCurrentTheme());
+            currentThemeValue.setText(UIStyleUtil.getCurrentTheme().getDisplayName());
+            fontComboBox.setSelectedItem("微软雅黑");
+            fontSizeSpinner.setValue(14);
+            JOptionPane.showMessageDialog(this, "已重置为默认设置！", "成功", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        panel.add(applyThemeButton, "span 2, align right, split 2");
+        panel.add(resetButton);
+
+        UIStyleUtil.setMainBackground(panel);
         return panel;
     }
 

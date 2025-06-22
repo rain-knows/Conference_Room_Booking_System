@@ -42,7 +42,8 @@ public class MyBookingsPanel extends JPanel {
 
         // 标题
         JLabel titleLabel = new JLabel("我的预订记录");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 26));
+        titleLabel.setForeground(new Color(41, 128, 185));
         add(titleLabel, "wrap, gapbottom 15");
 
         // 表格
@@ -54,9 +55,11 @@ public class MyBookingsPanel extends JPanel {
             }
         };
         bookingsTable = new JTable(tableModel);
+        bookingsTable.setFont(new Font("微软雅黑", Font.PLAIN, 15));
         bookingsTable.setRowHeight(28);
-        bookingsTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        bookingsTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
+        bookingsTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 16));
+        bookingsTable.getTableHeader().setBackground(new Color(230, 235, 245));
+        bookingsTable.setSelectionBackground(new Color(204, 229, 255));
         bookingsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         bookingsTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -72,22 +75,46 @@ public class MyBookingsPanel extends JPanel {
         buttonPanel.setOpaque(false);
         editBookingButton = new JButton("修改选中的预订");
         cancelBookingButton = new JButton("取消选中的预订");
+        JButton[] btns = { editBookingButton, cancelBookingButton };
+        Color mainColor = new Color(52, 152, 219);
+        Color hoverColor = new Color(41, 128, 185);
+        for (JButton btn : btns) {
+            btn.setBackground(mainColor);
+            btn.setForeground(Color.WHITE);
+            btn.setFont(new Font("微软雅黑", Font.BOLD, 15));
+            btn.setFocusPainted(false);
+            btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+            btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(hoverColor);
+                }
 
-        editBookingButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        cancelBookingButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(mainColor);
+                }
+            });
+        }
+        cancelBookingButton.setBackground(new Color(220, 53, 69));
+        cancelBookingButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cancelBookingButton.setBackground(new Color(200, 35, 51));
+            }
 
-        editBookingButton.setFocusPainted(false);
-        cancelBookingButton.setFocusPainted(false);
-
-        editBookingButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        cancelBookingButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cancelBookingButton.setBackground(new Color(220, 53, 69));
+            }
+        });
         editBookingButton.addActionListener(e -> editSelectedBooking());
         cancelBookingButton.addActionListener(e -> cancelSelectedBooking());
-
         buttonPanel.add(editBookingButton);
         buttonPanel.add(cancelBookingButton);
         add(buttonPanel, "growx, align right");
+
+        setBackground(new Color(245, 248, 252));
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true)));
 
         updateButtonStates(); // Initial state
     }
