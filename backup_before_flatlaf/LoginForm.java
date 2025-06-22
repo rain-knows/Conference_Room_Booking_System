@@ -48,13 +48,16 @@ public class LoginForm extends JFrame {
                 "push[center]10[center]push" // Push content to vertical center
         ));
 
+        // Use a professional blue color
+        panel.setBackground(new Color(36, 87, 166));
+
         JLabel title = new JLabel("高效，智能，便捷");
         title.setFont(new Font("微软雅黑", Font.BOLD, 32));
         title.setForeground(Color.WHITE);
 
         JLabel subtitle = new JLabel("企业级会议室预订与管理平台");
         subtitle.setFont(new Font("微软雅黑", Font.PLAIN, 16));
-        subtitle.setForeground(Color.WHITE);
+        subtitle.setForeground(new Color(200, 220, 255));
 
         panel.add(title);
         panel.add(subtitle);
@@ -68,12 +71,15 @@ public class LoginForm extends JFrame {
                 "[grow]", // Column
                 "[]30[]20[]10[]20[]30[]" // Rows with gaps
         ));
+        panel.setBackground(Color.WHITE);
 
         JLabel loginTitle = new JLabel("欢迎回来");
         loginTitle.setFont(new Font("微软雅黑", Font.BOLD, 28));
+        loginTitle.setForeground(new Color(50, 50, 50));
 
         JLabel loginSubtitle = new JLabel("请输入您的凭据以继续");
         loginSubtitle.setFont(new Font("微软雅黑", Font.PLAIN, 15));
+        loginSubtitle.setForeground(Color.GRAY);
 
         nameControl = new JTextField();
         passControl = new JPasswordField();
@@ -94,8 +100,21 @@ public class LoginForm extends JFrame {
 
         JButton loginButton = new JButton("立即登录");
         loginButton.setFont(new Font("微软雅黑", Font.BOLD, 16));
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setBackground(new Color(52, 152, 219));
         loginButton.setFocusPainted(false);
         loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        loginButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                loginButton.setBackground(new Color(41, 128, 185));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                loginButton.setBackground(new Color(52, 152, 219));
+            }
+        });
         loginButton.addActionListener(this::onLoginButtonClick);
 
         panel.add(loginTitle);

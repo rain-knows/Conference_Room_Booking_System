@@ -2,7 +2,7 @@
 
 ## 1. 系统概述
 
-会议室预订系统旨在为企业或组织提供一个高效、便捷的会议室资源管理和预订平台。用户可以通过该系统实时查看会议室的可用状态、在线预订会议室、管理个人预订，并接收相关的通知提醒。管理员则可以对会议室信息、用户信息及系统参数进行维护。
+会议室预订系统旨在为企业或组织提供一个高效、便捷的会议室资源管理和预订平台。用户可以通过该系统实时查看会议室的可用状态、在线预订会议室、管理个人预订，并接收相关的通知提醒。管理员则可以对会议室信息、用户信息及系统参数进行维护。系统采用基于字段映射的权限管理机制，通过用户角色和会议室类型的组合来控制访问权限。
 
 ## 2. 系统架构
 
@@ -34,10 +34,10 @@
 
 | 功能点         | 描述                                                                                                                                                              |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 会议室状态查看   | 用户可以在主界面右侧内容区查看所有会议室的实时状态。支持按日期、时间段、容纳人数、设备（如投影仪、白板）等条件进行筛选和排序。可用状态以不同颜色或标识清晰展示（例如，日历视图或列表视图）。                                                                 |
+| 会议室状态查看   | 用户可以在主界面右侧内容区查看所有会议室的实时状态。支持按日期、时间段、容纳人数、设备（如投影仪、白板）等条件进行筛选和排序。可用状态以不同颜色或标识清晰展示（例如，日历视图或列表视图）。系统根据用户权限只显示可查看的会议室。                                                                 |
 | 会议室详情查看   | 用户点击某个会议室后，可以查看其详细信息，包括名称、位置、容纳人数、可用设备列表、图片（可选）以及当前和未来的预订情况。                                                                                               |
-| 预订会议室     | 用户选择合适的会议室和空闲时间段后，填写预订主题、参会人数等信息提交预订请求。系统需检查时间冲突，并确认用户权限。预订成功后，更新会议室状态并通知用户。                                                                                       |
-| 我的预订管理   | 用户可以在“我的预订”界面查看自己所有已成功预订的会议列表（按时间排序）。                                                                                                                               |
+| 预订会议室     | 用户选择合适的会议室和空闲时间段后，填写预订主题、参会人数等信息提交预订请求。系统需检查时间冲突，并确认用户权限。预订按钮根据用户权限动态启用/禁用。预订成功后，更新会议室状态并通知用户。                                                                                       |
+| 我的预订管理   | 用户可以在"我的预订"界面查看自己所有已成功预订的会议列表（按时间排序）。                                                                                                                               |
 | 修改预订 (可选) | 在特定条件下（如预订开始前一段时间），用户可以修改自己的预订信息（如时间、主题），需重新检查冲突。                                                                                                             |
 | 取消预订       | 用户可以在预订开始前的一定时间内取消自己的预订。取消后，会议室在该时间段的状态将更新为可用。                                                                                                                   |
 
@@ -49,9 +49,18 @@
 | 修改个人信息 | 用户可以修改部分个人信息，如联系方式（邮箱）。                                           |
 | 修改密码   | 用户可以修改自己的登录密码，需要输入旧密码和新密码（需二次确认）。                                   |
 
-### 3.4 管理员功能模块 (需权限控制)
+### 3.4 权限管理模块
 
-#### 3.4.1 会议室管理
+| 功能点         | 描述                                                                                                                                                              |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 权限映射管理   | 系统管理员可以在系统设置中配置用户角色与会议室类型的权限映射关系。支持查看、预订、管理三种权限类型。                                                                                               |
+| 会议室类型管理 | 系统管理员可以添加、修改、删除会议室类型，每种类型包含类型名称、类型代码和描述信息。                                                                                               |
+| 权限检查机制   | 系统在会议室列表加载、预订操作、管理操作等关键节点进行权限检查，确保用户只能访问其权限范围内的功能。                                                                                               |
+| 动态权限控制   | 界面元素（如预订按钮、管理按钮）根据用户权限动态显示和启用状态，提供直观的权限反馈。                                                                                               |
+
+### 3.5 管理员功能模块 (需权限控制)
+
+#### 3.5.1 会议室管理
 
 | 功能点       | 描述                                                                                             |
 | ----------- | ------------------------------------------------------------------------------------------------ |
@@ -60,7 +69,7 @@
 | 删除会议室   | 管理员可以删除不再使用或需要下线的会议室。若会议室有未完成的预订，需给出提示或处理方案。                                                                   |
 | 查看所有会议室 | 管理员可以列表形式查看系统中所有会议室及其当前状态和基本信息。                                                                   |
 
-#### 3.4.2 用户管理
+#### 3.5.2 用户管理
 
 | 功能点     | 描述                                                                                               |
 | --------- | -------------------------------------------------------------------------------------------------- |
@@ -69,10 +78,12 @@
 | 禁用/启用用户 | 管理员可以禁用某些用户账户，使其无法登录系统；也可以重新启用被禁用的账户。                                                                     |
 | 删除用户   | 管理员可以删除用户账户（需谨慎操作，考虑关联数据处理）。                                                                           |
 
-#### 3.4.3 系统设置与维护
+#### 3.5.3 系统设置与维护
 
 | 功能点     | 描述                                                                                             |
 | --------- | ------------------------------------------------------------------------------------------------ |
+| 权限映射管理 | 系统管理员可以配置用户角色与会议室类型的权限映射关系，支持细粒度的权限控制。                                                                 |
+| 会议室类型管理 | 系统管理员可以管理会议室类型，包括添加、修改、删除会议室类型及其描述信息。                                                                 |
 | 预订规则设置 | (可选) 管理员可以设置预订规则，如最长预订时长、提前预订天数、取消预订时限等。                                                                 |
 | 查看操作日志 | (可选) 系统记录关键操作日志（如登录、预订、管理操作），管理员可查看日志用于审计或问题排查。                                                               |
 | 数据备份与恢复 | (规划中) 提供数据备份和恢复的功能入口或说明。                                                                      |
@@ -81,14 +92,14 @@
 
 *   **整体布局:** 使用 `MigLayout` 实现，窗口分为左右两栏。
     *   **左侧导航栏 (Sidebar Panel):** 固定宽度 (例如 `200px`)，背景色稍深以区分。包含一个导航标题和一组功能按钮。
-        *   `lblNavigationTitle`: 显示“导航菜单”。
-        *   `btnRoomStatus`: “会议室状态”
-        *   `btnMyBookings`: “我的预订”
-        *   `btnProfile`: “个人信息”
-        *   `btnAdminRoomMgmt`: “会议室管理” (管理员可见)
-        *   `btnAdminUserMgmt`: “用户管理” (管理员可见)
-        *   `btnAdminSettings`: “系统设置” (管理员可见)
-        *   `btnLogout`: “退出登录”，通常置于导航栏底部。
+        *   `lblNavigationTitle`: 显示"导航菜单"。
+        *   `btnRoomStatus`: "会议室状态"
+        *   `btnMyBookings`: "我的预订"
+        *   `btnProfile`: "个人信息"
+        *   `btnAdminRoomMgmt`: "会议室管理" (管理员可见)
+        *   `btnAdminUserMgmt`: "用户管理" (管理员可见)
+        *   `btnAdminSettings`: "系统设置" (管理员可见)
+        *   `btnLogout`: "退出登录"，通常置于导航栏底部。
     *   **右侧内容区 (Content Panel):** 占据剩余宽度，背景色通常为白色。根据左侧导航栏的选择，动态加载和显示对应的功能界面 (JPanel)。初始状态可显示欢迎信息或默认功能界面（如会议室状态）。
 
 *   **交互逻辑:**
@@ -113,41 +124,82 @@
 
 **核心表结构概要:**
 
-*   **`users`**
-    *   `user_id` (INT, PK, AI)
+*   **`User`** (用户表)
+    *   `userId` (INT, PK, AI)
     *   `username` (VARCHAR, UNIQUE, NOT NULL)
-    *   `password_hash` (VARCHAR, NOT NULL) - 存储加密后的密码
+    *   `password` (VARCHAR, NOT NULL) - 存储加密后的密码
     *   `email` (VARCHAR, UNIQUE, NOT NULL)
-    *   `role_id` (INT, FK references `roles.role_id`)
-    *   `created_at` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
-*   **`roles`**
-    *   `role_id` (INT, PK, AI)
-    *   `role_name` (VARCHAR, UNIQUE, NOT NULL) - 例如 'administrator', 'user'
-*   **`conference_rooms`**
-    *   `room_id` (INT, PK, AI)
-    *   `room_name` (VARCHAR, NOT NULL)
+    *   `role` (ENUM('NORMAL_EMPLOYEE', 'LEADER', 'SYSTEM_ADMIN'), NOT NULL)
+    *   `active` (BOOLEAN, NOT NULL, DEFAULT TRUE)
+*   **`RoomType`** (会议室类型表)
+    *   `roomTypeId` (INT, PK, AI)
+    *   `typeName` (VARCHAR, NOT NULL)
+    *   `typeCode` (VARCHAR, UNIQUE, NOT NULL)
+    *   `description` (VARCHAR)
+    *   `createTime` (DATETIME, DEFAULT CURRENT_TIMESTAMP)
+    *   `updateTime` (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE)
+*   **`MeetingRoom`** (会议室表)
+    *   `roomId` (INT, PK, AI)
+    *   `name` (VARCHAR, NOT NULL)
     *   `capacity` (INT)
     *   `location` (VARCHAR)
+    *   `description` (VARCHAR)
+    *   `roomTypeId` (INT, FK references `RoomType.roomTypeId`)
+    *   `status` (INT)
+*   **`Equipment`** (设备表)
+    *   `equipmentId` (INT, PK, AI)
+    *   `roomId` (INT, FK references `MeetingRoom.roomId`)
+    *   `name` (VARCHAR, NOT NULL)
+    *   `model` (VARCHAR)
+    *   `status` (INT)
+    *   `purchaseDate` (DATE)
+*   **`Reservation`** (预订表)
+    *   `reservationId` (INT, PK, AI)
+    *   `roomId` (INT, FK references `MeetingRoom.roomId`)
+    *   `userId` (INT, FK references `User.userId`)
+    *   `startTime` (DATETIME, NOT NULL)
+    *   `endTime` (DATETIME, NOT NULL)
+    *   `subject` (VARCHAR)
     *   `description` (TEXT)
-    *   `is_active` (BOOLEAN DEFAULT TRUE)
-*   **`room_equipment`** (会议室设备关联表 - 多对多)
-    *   `room_id` (INT, FK references `conference_rooms.room_id`)
-    *   `equipment_id` (INT, FK references `equipment.equipment_id`)
-    *   PRIMARY KEY (`room_id`, `equipment_id`)
-*   **`equipment`** (设备表)
-    *   `equipment_id` (INT, PK, AI)
-    *   `equipment_name` (VARCHAR, UNIQUE, NOT NULL) - 例如 'Projector', 'Whiteboard', 'Video Conferencing'
-*   **`bookings`**
-    *   `booking_id` (INT, PK, AI)
-    *   `room_id` (INT, FK references `conference_rooms.room_id`)
-    *   `user_id` (INT, FK references `users.user_id`)
-    *   `start_time` (DATETIME, NOT NULL)
-    *   `end_time` (DATETIME, NOT NULL)
-    *   `purpose` (VARCHAR)
-    *   `status` (ENUM('confirmed', 'pending', 'cancelled') DEFAULT 'confirmed')
-    *   `created_at` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+    *   `status` (INT)
+    *   `createdTime` (DATETIME, DEFAULT CURRENT_TIMESTAMP)
+*   **`PermissionMapping`** (权限映射表)
+    *   `mappingId` (INT, PK, AI)
+    *   `userRole` (VARCHAR, NOT NULL)
+    *   `roomTypeCode` (VARCHAR, NOT NULL)
+    *   `canBook` (BOOLEAN, NOT NULL, DEFAULT FALSE)
+    *   `canView` (BOOLEAN, NOT NULL, DEFAULT FALSE)
+    *   `canManage` (BOOLEAN, NOT NULL, DEFAULT FALSE)
+    *   `description` (VARCHAR)
+    *   `createTime` (DATETIME, DEFAULT CURRENT_TIMESTAMP)
+    *   `updateTime` (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE)
 
-## 6. 非功能性需求
+## 6. 权限系统设计
+
+### 6.1 权限模型
+
+系统采用基于字段映射的权限模型，通过以下三个维度控制访问权限：
+
+1. **用户角色** (`User.role`): NORMAL_EMPLOYEE, LEADER, SYSTEM_ADMIN
+2. **会议室类型** (`RoomType.typeCode`): BASIC, PREMIUM, VIP
+3. **权限类型**: 查看(canView), 预订(canBook), 管理(canManage)
+
+### 6.2 默认权限配置
+
+| 用户角色 | 基础会议室 | 高级会议室 | VIP会议室 |
+|---------|-----------|-----------|-----------|
+| SYSTEM_ADMIN | 完全管理 | 完全管理 | 完全管理 |
+| LEADER | 可预订查看 | 可预订查看 | 可预订查看 |
+| NORMAL_EMPLOYEE | 可预订查看 | 仅查看 | 无权限 |
+
+### 6.3 权限检查流程
+
+1. **会议室列表加载**: 只显示用户有权限查看的会议室
+2. **预订按钮状态**: 根据用户权限和会议室状态动态启用/禁用
+3. **预订操作验证**: 在预订前再次检查用户权限
+4. **管理权限检查**: 在管理操作前验证用户权限
+
+## 7. 非功能性需求
 
 | 需求类型   | 描述                                                                                                                               |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -155,15 +207,16 @@
 | **可靠性** | 系统应能长时间稳定运行，预订数据准确无误，避免数据丢失或不一致。对于并发预订请求，应有机制处理冲突（例如，通过数据库事务或乐观锁/悲观锁）。                                                               |
 | **安全性** | - 用户密码必须加密存储（例如使用 bcrypt 或 Argon2）。
              - 防止常见的Web安全漏洞（虽然是桌面应用，但数据交互安全仍需考虑，如SQL注入，尽管JDBC预编译语句可部分防范）。
-             - 实现基于角色的访问控制 (RBAC)，确保用户只能访问其权限范围内的功能和数据。                                                                 |
+             - 实现基于字段映射的权限控制，确保用户只能访问其权限范围内的功能和数据。                                                                 |
 | **可维护性** | - 代码结构清晰，遵循良好的编程规范和设计模式（如DAO模式）。
              - 模块化设计，降低模块间的耦合度。
              - 提供必要的注释和文档。                                                                                                             |
 | **性能**   | - 系统对用户操作的响应时间应在可接受范围内（例如，查询会议室状态、提交预订请求等操作应在几秒内完成）。
-             - 数据库查询应进行优化，对常用查询字段建立索引。                                                                                               |
-| **可扩展性** | 系统设计应考虑到未来功能扩展的可能性，例如集成日历服务、增加审批流程等。                                                                                       |
+             - 数据库查询应进行优化，对常用查询字段建立索引。
+             - 权限检查查询应优化，避免频繁的数据库访问。                                                                                               |
+| **可扩展性** | 系统设计应考虑到未来功能扩展的可能性，例如集成日历服务、增加审批流程等。权限系统支持动态扩展新的用户角色和会议室类型。                                                                                       |
 
-## 7. 待办与未来展望
+## 8. 待办与未来展望
 
 *   实现各导航按钮对应的具体功能面板 (JPanel)。
 *   完善用户角色与权限管理逻辑。
@@ -172,3 +225,4 @@
 *   添加邮件/系统内通知功能，用于预订成功、预订提醒、预订变更等。
 *   考虑引入日志框架 (如 Log4j 或 SLF4j) 进行更完善的日志记录。
 *   单元测试和集成测试的覆盖。
+*   权限系统的进一步优化和扩展。

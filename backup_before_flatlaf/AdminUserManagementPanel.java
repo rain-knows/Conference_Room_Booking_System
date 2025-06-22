@@ -38,7 +38,7 @@ public class AdminUserManagementPanel extends JPanel {
         setLayout(new MigLayout("fill, insets 20", "[grow][]", "[][grow]"));
 
         JLabel titleLabel = new JLabel("用户管理");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         add(titleLabel, "span, wrap, gapbottom 15");
 
         // Table
@@ -50,9 +50,11 @@ public class AdminUserManagementPanel extends JPanel {
             }
         };
         userTable = new JTable(tableModel);
+        userTable.setFont(new Font("微软雅黑", Font.PLAIN, 15));
         userTable.setRowHeight(28);
-        userTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        userTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
+        userTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 16));
+        userTable.getTableHeader().setBackground(new Color(230, 235, 245));
+        userTable.setSelectionBackground(new Color(204, 229, 255));
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(userTable), "grow, push");
 
@@ -63,13 +65,10 @@ public class AdminUserManagementPanel extends JPanel {
         JButton deleteButton = new JButton("删除用户");
         JButton resetPasswordButton = new JButton("重置密码");
         JButton toggleStatusButton = new JButton("启用/禁用");
-
         JButton[] btns = { addButton, editButton, deleteButton, resetPasswordButton, toggleStatusButton };
         for (JButton btn : btns) {
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
-            btn.setFocusPainted(false);
+            UIStyleUtil.beautifyButton(btn);
         }
-
         addButton.addActionListener(e -> openEditDialog(null));
         editButton.addActionListener(e -> {
             User selectedUser = getSelectedUser();
@@ -89,6 +88,8 @@ public class AdminUserManagementPanel extends JPanel {
         buttonPanel.add(resetPasswordButton, "gaptop 10");
         buttonPanel.add(toggleStatusButton, "gaptop 10");
         add(buttonPanel, "top");
+
+        UIStyleUtil.setMainBackground(this);
     }
 
     private User getSelectedUser() {
@@ -313,9 +314,13 @@ public class AdminUserManagementPanel extends JPanel {
 
             setLayout(new MigLayout("fill, insets 25", "[120px][grow,fill]", "[][][][][][grow][]"));
 
+            // 设置对话框样式
+            getContentPane().setBackground(new Color(248, 249, 250));
+
             // 标题
             JLabel titleLabel = new JLabel(isNewUser ? "添加新用户" : "编辑用户");
             titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+            titleLabel.setForeground(new Color(52, 73, 94));
             add(titleLabel, "span 2, center, wrap, gapbottom 25");
 
             // 初始化组件
@@ -336,28 +341,28 @@ public class AdminUserManagementPanel extends JPanel {
             usernameField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
             usernameField.setPreferredSize(new Dimension(250, 32));
             usernameField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
+                    BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
                     BorderFactory.createEmptyBorder(6, 10, 6, 10)));
 
             emailField = new JTextField();
             emailField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
             emailField.setPreferredSize(new Dimension(250, 32));
             emailField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
+                    BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
                     BorderFactory.createEmptyBorder(6, 10, 6, 10)));
 
             phoneField = new JTextField();
             phoneField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
             phoneField.setPreferredSize(new Dimension(250, 32));
             phoneField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
+                    BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
                     BorderFactory.createEmptyBorder(6, 10, 6, 10)));
 
             passwordField = new JPasswordField();
             passwordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
             passwordField.setPreferredSize(new Dimension(250, 32));
             passwordField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
+                    BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
                     BorderFactory.createEmptyBorder(6, 10, 6, 10)));
 
             // 使用显示名称的角色选项
@@ -368,6 +373,7 @@ public class AdminUserManagementPanel extends JPanel {
 
             activeCheckBox = new JCheckBox("账户激活", true);
             activeCheckBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            activeCheckBox.setForeground(new Color(52, 73, 94));
         }
 
         private void populateFields() {
@@ -383,38 +389,44 @@ public class AdminUserManagementPanel extends JPanel {
         private void layoutComponents() {
             // 用户名
             JLabel usernameLabel = new JLabel("用户名:");
-            usernameLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            usernameLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            usernameLabel.setForeground(new Color(52, 73, 94));
             add(usernameLabel);
             add(usernameField, "growx, wrap, gaptop 5, gapbottom 15");
 
             // 邮箱
             JLabel emailLabel = new JLabel("邮箱:");
-            emailLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            emailLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            emailLabel.setForeground(new Color(52, 73, 94));
             add(emailLabel);
             add(emailField, "growx, wrap, gaptop 5, gapbottom 15");
 
             // 电话
             JLabel phoneLabel = new JLabel("电话:");
-            phoneLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            phoneLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            phoneLabel.setForeground(new Color(52, 73, 94));
             add(phoneLabel);
             add(phoneField, "growx, wrap, gaptop 5, gapbottom 15");
 
             // 角色
             JLabel roleLabel = new JLabel("角色:");
-            roleLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            roleLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            roleLabel.setForeground(new Color(52, 73, 94));
             add(roleLabel);
             add(roleComboBox, "growx, wrap, gaptop 5, gapbottom 15");
 
             // 状态
             JLabel statusLabel = new JLabel("状态:");
-            statusLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            statusLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            statusLabel.setForeground(new Color(52, 73, 94));
             add(statusLabel);
             add(activeCheckBox, "growx, wrap, gaptop 5, gapbottom 15");
 
             // 密码（仅新用户）
             if (isNewUser) {
                 JLabel passwordLabel = new JLabel("初始密码:");
-                passwordLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+                passwordLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+                passwordLabel.setForeground(new Color(52, 73, 94));
                 add(passwordLabel);
                 add(passwordField, "growx, wrap, gaptop 5, gapbottom 20");
             } else {
@@ -424,12 +436,16 @@ public class AdminUserManagementPanel extends JPanel {
             // 按钮
             JButton saveButton = new JButton("保存");
             saveButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            saveButton.setBackground(new Color(40, 167, 69));
+            saveButton.setForeground(Color.WHITE);
             saveButton.setPreferredSize(new Dimension(100, 35));
             saveButton.setFocusPainted(false);
             saveButton.addActionListener(e -> save());
 
             JButton cancelButton = new JButton("取消");
             cancelButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            cancelButton.setBackground(new Color(108, 117, 125));
+            cancelButton.setForeground(Color.WHITE);
             cancelButton.setPreferredSize(new Dimension(100, 35));
             cancelButton.setFocusPainted(false);
             cancelButton.addActionListener(e -> dispose());

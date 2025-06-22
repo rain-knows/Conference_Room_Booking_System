@@ -32,7 +32,7 @@ public class AdminRoomManagementPanel extends JPanel {
         setLayout(new MigLayout("fill, insets 20", "[grow][]", "[][grow]"));
 
         JLabel titleLabel = new JLabel("会议室管理");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         add(titleLabel, "span, wrap, gapbottom 15");
 
         // Table
@@ -44,23 +44,23 @@ public class AdminRoomManagementPanel extends JPanel {
             }
         };
         roomTable = new JTable(tableModel);
+        roomTable.setFont(new Font("微软雅黑", Font.PLAIN, 15));
         roomTable.setRowHeight(28);
-        roomTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        roomTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
-
+        roomTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 16));
+        roomTable.getTableHeader().setBackground(new Color(230, 235, 245));
+        roomTable.setSelectionBackground(new Color(204, 229, 255));
         // 表头筛选弹出菜单
         statusFilterMenu = new JPopupMenu();
         String[] statusOptions = { "全部", "可用", "维护中", "已停用" };
         for (String status : statusOptions) {
             JMenuItem item = new JMenuItem(status);
-            item.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            item.setFont(new Font("微软雅黑", Font.PLAIN, 15));
             item.addActionListener(e -> {
                 currentStatusFilter = status;
                 applyFilters();
             });
             statusFilterMenu.add(item);
         }
-
         JTableHeader header = roomTable.getTableHeader();
         header.setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
             JLabel lbl = new JLabel();
@@ -75,7 +75,6 @@ public class AdminRoomManagementPanel extends JPanel {
             }
             return lbl;
         });
-
         header.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -85,7 +84,6 @@ public class AdminRoomManagementPanel extends JPanel {
                 }
             }
         });
-
         add(new JScrollPane(roomTable), "grow, push");
 
         // Button Panel
@@ -94,13 +92,20 @@ public class AdminRoomManagementPanel extends JPanel {
         JButton addButton = new JButton("添加会议室");
         JButton editButton = new JButton("编辑选中项");
         JButton deleteButton = new JButton("删除选中项");
-
         JButton[] btns = { addButton, editButton, deleteButton };
         for (JButton btn : btns) {
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
-            btn.setFocusPainted(false);
+            UIStyleUtil.beautifyButton(btn);
         }
+        addButton.setBackground(new Color(40, 180, 99));
+        addButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                addButton.setBackground(new Color(30, 160, 80));
+            }
 
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                addButton.setBackground(new Color(40, 180, 99));
+            }
+        });
         addButton.addActionListener(e -> openEditDialog(null));
         editButton.addActionListener(e -> {
             MeetingRoom selected = getSelectedMeetingRoom();
@@ -111,11 +116,15 @@ public class AdminRoomManagementPanel extends JPanel {
             }
         });
         deleteButton.addActionListener(e -> deleteSelectedRoom());
-
         buttonPanel.add(addButton);
         buttonPanel.add(editButton, "gaptop 10");
         buttonPanel.add(deleteButton, "gaptop 10");
         add(buttonPanel, "top");
+
+        UIStyleUtil.setMainBackground(this);
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true)));
     }
 
     private MeetingRoom getSelectedMeetingRoom() {
@@ -260,19 +269,10 @@ public class AdminRoomManagementPanel extends JPanel {
             setLayout(new MigLayout("wrap 2, fillx", "[100px][grow,fill]"));
 
             nameField = new JTextField();
-            nameField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
             capacityField = new JTextField();
-            capacityField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
             locationField = new JTextField();
-            locationField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
             descriptionArea = new JTextArea(3, 20);
-            descriptionArea.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
             statusComboBox = new JComboBox<>(new String[] { "可用", "维护中", "已停用" });
-            statusComboBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
 
             if (room != null) {
                 nameField.setText(room.getName());
@@ -282,38 +282,22 @@ public class AdminRoomManagementPanel extends JPanel {
                 statusComboBox.setSelectedIndex(room.getStatus() - 1);
             }
 
-            JLabel nameLabel = new JLabel("名称:");
-            nameLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(nameLabel);
+            add(new JLabel("名称:"));
             add(nameField, "growx");
-
-            JLabel capacityLabel = new JLabel("容量:");
-            capacityLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(capacityLabel);
+            add(new JLabel("容量:"));
             add(capacityField, "growx");
-
-            JLabel locationLabel = new JLabel("位置:");
-            locationLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(locationLabel);
+            add(new JLabel("位置:"));
             add(locationField, "growx");
-
-            JLabel statusLabel = new JLabel("状态:");
-            statusLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(statusLabel);
+            add(new JLabel("状态:"));
             add(statusComboBox, "growx");
-
-            JLabel descLabel = new JLabel("描述:");
-            descLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(descLabel, "top");
+            add(new JLabel("描述:"), "top");
             add(new JScrollPane(descriptionArea), "grow");
 
             JButton saveButton = new JButton("保存");
-            saveButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
             saveButton.addActionListener(e -> save());
             add(saveButton, "span, split 2, align right");
 
             JButton cancelButton = new JButton("取消");
-            cancelButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
             cancelButton.addActionListener(e -> dispose());
             add(cancelButton);
 

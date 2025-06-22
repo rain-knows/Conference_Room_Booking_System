@@ -54,7 +54,7 @@ public class RoomStatusPanel extends JPanel {
         setLayout(new MigLayout("fill, insets 20", "[grow][]", "[][grow]"));
 
         JLabel titleLabel = new JLabel("会议室状态");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         add(titleLabel, "span, wrap, gapbottom 15");
 
         // Table
@@ -66,9 +66,11 @@ public class RoomStatusPanel extends JPanel {
             }
         };
         roomTable = new JTable(tableModel);
+        roomTable.setFont(new Font("微软雅黑", Font.PLAIN, 15));
         roomTable.setRowHeight(28);
-        roomTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        roomTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
+        roomTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 16));
+        roomTable.getTableHeader().setBackground(new Color(230, 235, 245));
+        roomTable.setSelectionBackground(new Color(204, 229, 255));
         roomTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         roomTable.getColumn("状态").setCellRenderer(new StatusCellRenderer());
         roomTable.getSelectionModel().addListSelectionListener(e -> {
@@ -76,20 +78,18 @@ public class RoomStatusPanel extends JPanel {
                 updateButtonState();
             }
         });
-
         // 表头筛选弹出菜单
         statusFilterMenu = new JPopupMenu();
         String[] statusOptions = { "全部", "空闲", "使用中", "维护中", "已停用" };
         for (String status : statusOptions) {
             JMenuItem item = new JMenuItem(status);
-            item.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            item.setFont(new Font("微软雅黑", Font.PLAIN, 15));
             item.addActionListener(e -> {
                 currentStatusFilter = status;
                 applyFilters();
             });
             statusFilterMenu.add(item);
         }
-
         JTableHeader header = roomTable.getTableHeader();
         // 自定义表头渲染器，状态列加下拉箭头
         header.setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
@@ -105,7 +105,6 @@ public class RoomStatusPanel extends JPanel {
             }
             return lbl;
         });
-
         header.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -115,25 +114,22 @@ public class RoomStatusPanel extends JPanel {
                 }
             }
         });
-
         add(new JScrollPane(roomTable), "grow, push");
 
         // Button Panel
         JPanel buttonPanel = new JPanel(new MigLayout("wrap 1, fillx", "[grow, fill]"));
         detailsButton = new JButton("查看详情");
         bookButton = new JButton("预约会议室");
-
-        detailsButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        bookButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-
+        UIStyleUtil.beautifyButton(detailsButton);
+        UIStyleUtil.beautifyButton(bookButton);
         detailsButton.addActionListener(e -> showSelectedRoomDetails());
         bookButton.addActionListener(e -> bookSelectedRoom());
-
         buttonPanel.setOpaque(false);
         buttonPanel.add(detailsButton, "gaptop 10");
         buttonPanel.add(bookButton, "gaptop 10");
         add(buttonPanel, "top");
 
+        UIStyleUtil.setMainBackground(this);
         updateButtonState(); // Initial state
     }
 
@@ -379,22 +375,30 @@ public class RoomStatusPanel extends JPanel {
             setOpaque(true);
             setHorizontalAlignment(CENTER);
             setFont(new Font("微软雅黑", Font.BOLD, 12));
+            setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
         }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             setText(value.toString());
+            setForeground(Color.WHITE);
 
-            // 使用主题默认颜色，不设置硬编码颜色
-            if (isSelected) {
-                setBackground(table.getSelectionBackground());
-                setForeground(table.getSelectionForeground());
-            } else {
-                setBackground(table.getBackground());
-                setForeground(table.getForeground());
+            switch (value.toString()) {
+                case "空闲":
+                    setBackground(Color.decode("#28A745")); // Green
+                    break;
+                case "使用中":
+                    setBackground(Color.decode("#DC3545")); // Red
+                    break;
+                case "维护中":
+                case "已停用":
+                    setBackground(Color.decode("#FFC107")); // Yellow
+                    break;
+                default:
+                    setBackground(Color.GRAY);
+                    break;
             }
-
             return this;
         }
     }

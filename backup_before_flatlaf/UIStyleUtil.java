@@ -68,10 +68,10 @@ public class UIStyleUtil {
     }
 
     /**
-     * 应用默认的macOS Dark主题
+     * 应用默认的IntelliJ Light主题
      */
     public static void applyDefaultTheme() {
-        applyTheme(ThemeType.MAC_DARK);
+        applyTheme(ThemeType.INTELLIJ_LIGHT);
     }
 
     /**
@@ -102,7 +102,7 @@ public class UIStyleUtil {
             }
         }
 
-        return ThemeType.MAC_DARK; // 默认返回macOS Dark
+        return ThemeType.INTELLIJ_LIGHT; // 默认返回IntelliJ Light
     }
 
     /**
@@ -145,13 +145,13 @@ public class UIStyleUtil {
      * 在应用程序启动时调用
      */
     public static void initializeUI() {
-        // 设置默认主题为 macOS Dark
-        applyTheme(ThemeType.MAC_DARK);
+        // 设置默认主题为 IntelliJ Light
+        applyTheme(ThemeType.INTELLIJ_LIGHT);
 
         // 设置默认字体
         setDefaultFont();
 
-        // 设置一些全局UI属性，让FlatLaf主题完全控制
+        // 设置一些全局UI属性
         UIManager.put("Button.arc", 8);
         UIManager.put("Component.arc", 8);
         UIManager.put("TextComponent.arc", 8);
@@ -159,48 +159,7 @@ public class UIStyleUtil {
         // 设置表格行高
         UIManager.put("Table.rowHeight", 30);
 
-        // 设置滚动条样式，使用主题默认值
+        // 设置滚动条样式
         UIManager.put("ScrollBar.width", 12);
-    }
-
-    /**
-     * 美化按钮样式 - 使用主题默认样式
-     */
-    public static void beautifyButton(JButton button) {
-        button.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-    }
-
-    /**
-     * 美化输入框样式 - 使用主题默认样式
-     */
-    public static void beautifyTextField(JTextField textField) {
-        textField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-    }
-
-    public static void beautifyPasswordField(JPasswordField passField) {
-        passField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-    }
-
-    /**
-     * 美化标题标签 - 使用主题默认样式
-     */
-    public static void beautifyTitleLabel(JLabel label) {
-        label.setFont(new Font("微软雅黑", Font.BOLD, 24));
-    }
-
-    /**
-     * 美化普通标签 - 使用主题默认样式
-     */
-    public static void beautifyLabel(JLabel label) {
-        label.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-    }
-
-    /**
-     * 设置主背景色 - 使用主题默认背景
-     */
-    public static void setMainBackground(Container container) {
-        // 让主题控制背景色，不设置硬编码颜色
     }
 }

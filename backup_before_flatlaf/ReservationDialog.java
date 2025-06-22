@@ -40,14 +40,19 @@ public class ReservationDialog extends JDialog {
         setTitle(currentReservation == null ? "新建预订 - " + room.getName() : "修改预订 - " + room.getName());
         setLayout(new MigLayout("fill, insets 25", "[120px][grow,fill][grow,fill][grow,fill]", "[][][][][grow][]"));
 
+        // 设置对话框样式
+        getContentPane().setBackground(new Color(248, 249, 250));
+
         // 标题区域
         JLabel titleLabel = new JLabel(currentReservation == null ? "新建预订" : "修改预订");
         titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(52, 73, 94));
         add(titleLabel, "span 4, center, wrap, gapbottom 20");
 
         // 会议室信息
         JLabel roomInfoLabel = new JLabel("会议室: " + room.getName() + " (" + room.getLocation() + ")");
         roomInfoLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        roomInfoLabel.setForeground(new Color(108, 117, 125));
         add(roomInfoLabel, "span 4, center, wrap, gapbottom 15");
 
         // Components with better styling
@@ -60,7 +65,7 @@ public class ReservationDialog extends JDialog {
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
+                BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
 
         // Date and Time Spinners with better styling
@@ -86,36 +91,44 @@ public class ReservationDialog extends JDialog {
 
         // Layout with better spacing and styling
         JLabel subjectLabel = new JLabel("会议主题:");
-        subjectLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        subjectLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        subjectLabel.setForeground(new Color(52, 73, 94));
         add(subjectLabel);
         add(subjectField, "span 3, growx, wrap, gaptop 5, gapbottom 15");
 
         JLabel startLabel = new JLabel("开始时间:");
-        startLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        startLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        startLabel.setForeground(new Color(52, 73, 94));
         add(startLabel);
         add(startDateSpinner, "growx");
         add(startTimeSpinner, "span 2, growx, wrap, gaptop 5, gapbottom 15");
 
         JLabel endLabel = new JLabel("结束时间:");
-        endLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        endLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        endLabel.setForeground(new Color(52, 73, 94));
         add(endLabel);
         add(endDateSpinner, "growx");
         add(endTimeSpinner, "span 2, growx, wrap, gaptop 5, gapbottom 15");
 
         JLabel descLabel = new JLabel("会议描述:");
-        descLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        descLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        descLabel.setForeground(new Color(52, 73, 94));
         add(descLabel, "top, gaptop 5");
         add(new JScrollPane(descriptionArea), "span 3, grow, gaptop 5, gapbottom 20");
 
         // Buttons with better styling
         JButton saveButton = new JButton("保存预订");
         saveButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        saveButton.setBackground(new Color(40, 167, 69));
+        saveButton.setForeground(Color.WHITE);
         saveButton.setPreferredSize(new Dimension(100, 35));
         saveButton.setFocusPainted(false);
         saveButton.addActionListener(e -> saveReservation());
 
         JButton cancelButton = new JButton("取消");
         cancelButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        cancelButton.setBackground(new Color(108, 117, 125));
+        cancelButton.setForeground(Color.WHITE);
         cancelButton.setPreferredSize(new Dimension(100, 35));
         cancelButton.setFocusPainted(false);
         cancelButton.addActionListener(e -> dispose());

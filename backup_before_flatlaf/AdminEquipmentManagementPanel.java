@@ -34,7 +34,7 @@ public class AdminEquipmentManagementPanel extends JPanel {
         setLayout(new MigLayout("fill, insets 20", "[grow][]", "[][grow]"));
 
         JLabel titleLabel = new JLabel("设备管理");
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        UIStyleUtil.beautifyTitleLabel(titleLabel);
         add(titleLabel, "span, wrap, gapbottom 15");
 
         // Table
@@ -46,24 +46,24 @@ public class AdminEquipmentManagementPanel extends JPanel {
             }
         };
         equipmentTable = new JTable(tableModel);
+        equipmentTable.setFont(new Font("微软雅黑", Font.PLAIN, 15));
         equipmentTable.setRowHeight(28);
-        equipmentTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        equipmentTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
+        equipmentTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 16));
+        equipmentTable.getTableHeader().setBackground(new Color(230, 235, 245));
+        equipmentTable.setSelectionBackground(new Color(204, 229, 255));
         equipmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
         // 表头筛选弹出菜单
         statusFilterMenu = new JPopupMenu();
         String[] statusOptions = { "全部", "正常", "损坏", "维修中", "已报废" };
         for (String status : statusOptions) {
             JMenuItem item = new JMenuItem(status);
-            item.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            item.setFont(new Font("微软雅黑", Font.PLAIN, 15));
             item.addActionListener(e -> {
                 currentStatusFilter = status;
                 applyFilters();
             });
             statusFilterMenu.add(item);
         }
-
         JTableHeader header = equipmentTable.getTableHeader();
         header.setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
             JLabel lbl = new JLabel();
@@ -78,7 +78,6 @@ public class AdminEquipmentManagementPanel extends JPanel {
             }
             return lbl;
         });
-
         header.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -88,7 +87,6 @@ public class AdminEquipmentManagementPanel extends JPanel {
                 }
             }
         });
-
         add(new JScrollPane(equipmentTable), "grow, push");
 
         // Button Panel
@@ -96,13 +94,10 @@ public class AdminEquipmentManagementPanel extends JPanel {
         JButton addButton = new JButton("添加设备");
         JButton editButton = new JButton("编辑选中项");
         JButton deleteButton = new JButton("删除选中项");
-
         JButton[] btns = { addButton, editButton, deleteButton };
         for (JButton btn : btns) {
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
-            btn.setFocusPainted(false);
+            UIStyleUtil.beautifyButton(btn);
         }
-
         addButton.addActionListener(e -> openEditDialog(null));
         editButton.addActionListener(e -> {
             int selectedRow = equipmentTable.getSelectedRow();
@@ -119,6 +114,8 @@ public class AdminEquipmentManagementPanel extends JPanel {
         buttonPanel.add(editButton, "gaptop 10");
         buttonPanel.add(deleteButton, "gaptop 10");
         add(buttonPanel, "top");
+
+        UIStyleUtil.setMainBackground(this);
     }
 
     private void loadEquipment() {
@@ -219,30 +216,27 @@ public class AdminEquipmentManagementPanel extends JPanel {
     }
 
     private void applyFilters() {
-        if (equipmentList == null)
+        if (tableModel == null)
             return;
-        List<Equipment> filtered;
-        if (currentStatusFilter.equals("全部")) {
-            filtered = equipmentList;
-        } else {
-            filtered = new Vector<>();
-            for (Equipment eq : equipmentList) {
-                if (eq.getStatusText().equals(currentStatusFilter)) {
-                    filtered.add(eq);
-                }
+        List<Vector> allRows = new Vector<>();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            Vector row = new Vector();
+            for (int j = 0; j < tableModel.getColumnCount(); j++) {
+                row.add(tableModel.getValueAt(i, j));
             }
+            allRows.add(row);
         }
         tableModel.setRowCount(0);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        for (Equipment eq : filtered) {
-            Vector<Object> row = new Vector<>();
-            row.add(eq.getEquipmentId());
-            row.add(eq.getName());
-            row.add(eq.getModel());
-            row.add(eq.getRoomName() != null ? eq.getRoomName() : "未分配");
-            row.add(eq.getStatusText());
-            row.add(eq.getPurchaseDate() != null ? dateFormat.format(eq.getPurchaseDate()) : "");
-            tableModel.addRow(row);
+        if (currentStatusFilter.equals("全部")) {
+            for (Vector row : allRows) {
+                tableModel.addRow(row);
+            }
+        } else {
+            for (Vector row : allRows) {
+                if (row.get(4).equals(currentStatusFilter)) {
+                    tableModel.addRow(row);
+                }
+            }
         }
     }
 
@@ -264,16 +258,9 @@ public class AdminEquipmentManagementPanel extends JPanel {
             setLayout(new MigLayout("wrap 2, fillx", "[100px][grow,fill]"));
 
             nameField = new JTextField();
-            nameField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
             modelField = new JTextField();
-            modelField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
-            dateField = new JTextField();
-            dateField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
-            roomComboBox = new JComboBox<>(rooms.toArray(new MeetingRoom[0]));
-            roomComboBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            dateField = new JTextField("yyyy-MM-dd");
+            roomComboBox = new JComboBox<>(new Vector<>(rooms));
             roomComboBox.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -286,58 +273,37 @@ public class AdminEquipmentManagementPanel extends JPanel {
                 }
             });
 
-            statusComboBox = new JComboBox<>(new String[] { "正常", "损坏", "维修中", "已报废" });
-            statusComboBox.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+            statusComboBox = new JComboBox<>(new String[] { "正常", "维修中", "报废" });
 
             if (equipment != null) {
                 nameField.setText(equipment.getName());
                 modelField.setText(equipment.getModel());
-                dateField.setText(equipment.getPurchaseDate() != null
-                        ? new SimpleDateFormat("yyyy-MM-dd").format(equipment.getPurchaseDate())
-                        : "");
-                statusComboBox.setSelectedItem(equipment.getStatusText());
-                // Set room selection
-                for (int i = 0; i < roomComboBox.getItemCount(); i++) {
-                    MeetingRoom room = roomComboBox.getItemAt(i);
+                dateField.setText(new SimpleDateFormat("yyyy-MM-dd").format(equipment.getPurchaseDate()));
+                statusComboBox.setSelectedIndex(equipment.getStatus() - 1);
+                for (MeetingRoom room : rooms) {
                     if (room.getRoomId() == equipment.getRoomId()) {
-                        roomComboBox.setSelectedIndex(i);
+                        roomComboBox.setSelectedItem(room);
                         break;
                     }
                 }
             }
 
-            JLabel nameLabel = new JLabel("设备名称:");
-            nameLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(nameLabel);
+            add(new JLabel("设备名称:"));
             add(nameField, "growx");
-
-            JLabel modelLabel = new JLabel("型号:");
-            modelLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(modelLabel);
+            add(new JLabel("型号:"));
             add(modelField, "growx");
-
-            JLabel roomLabel = new JLabel("所属会议室:");
-            roomLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(roomLabel);
+            add(new JLabel("所属会议室:"));
             add(roomComboBox, "growx");
-
-            JLabel statusLabel = new JLabel("状态:");
-            statusLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(statusLabel);
+            add(new JLabel("状态:"));
             add(statusComboBox, "growx");
-
-            JLabel dateLabel = new JLabel("购买日期:");
-            dateLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-            add(dateLabel);
+            add(new JLabel("购买日期:"));
             add(dateField, "growx");
 
             JButton saveButton = new JButton("保存");
-            saveButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
             saveButton.addActionListener(e -> save());
-            add(saveButton, "span, split 2, align right");
+            add(saveButton, "span, split 2, align right, gaptop 15");
 
             JButton cancelButton = new JButton("取消");
-            cancelButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
             cancelButton.addActionListener(e -> dispose());
             add(cancelButton);
 
@@ -350,60 +316,39 @@ public class AdminEquipmentManagementPanel extends JPanel {
         }
 
         private void save() {
-            // Basic validation
             if (nameField.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "设备名称不能为空。", "输入错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (roomComboBox.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(this, "必须为设备选择一个会议室。", "输入错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Date purchaseDate;
+            try {
+                java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(dateField.getText().trim());
+                purchaseDate = new Date(utilDate.getTime());
+            } catch (ParseException e) {
+                JOptionPane.showMessageDialog(this, "日期格式无效，请输入 yyyy-MM-dd 格式。", "输入错误", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             String name = nameField.getText().trim();
             String model = modelField.getText().trim();
+            int status = statusComboBox.getSelectedIndex() + 1;
             MeetingRoom selectedRoom = (MeetingRoom) roomComboBox.getSelectedItem();
-            String statusText = (String) statusComboBox.getSelectedItem();
-
-            // Convert status text to status code
-            int status;
-            switch (statusText) {
-                case "正常":
-                    status = Equipment.STATUS_NORMAL;
-                    break;
-                case "损坏":
-                    status = Equipment.STATUS_NORMAL; // 暂时使用正常状态
-                    break;
-                case "维修中":
-                    status = Equipment.STATUS_MAINTENANCE;
-                    break;
-                case "已报废":
-                    status = Equipment.STATUS_SCRAPPED;
-                    break;
-                default:
-                    status = Equipment.STATUS_NORMAL;
-            }
-
-            // Parse date
-            final Date purchaseDate;
-            if (!dateField.getText().trim().isEmpty()) {
-                try {
-                    purchaseDate = Date.valueOf(dateField.getText().trim());
-                } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(this, "购买日期格式不正确，请使用 yyyy-MM-dd 格式。", "输入错误",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            } else {
-                purchaseDate = null;
-            }
+            int roomId = selectedRoom.getRoomId();
 
             new SwingWorker<Boolean, Void>() {
                 @Override
                 protected Boolean doInBackground() throws Exception {
-                    if (currentEquipment == null) { // Add new equipment
-                        Equipment newEquipment = new Equipment(selectedRoom.getRoomId(), name, model, status,
-                                purchaseDate);
+                    if (currentEquipment == null) {
+                        Equipment newEquipment = new Equipment(roomId, name, model, status, purchaseDate);
                         return equipmentDAO.addEquipment(newEquipment);
-                    } else { // Update existing equipment
-                        Equipment updatedEquipment = new Equipment(currentEquipment.getEquipmentId(),
-                                selectedRoom.getRoomId(), name, model, status, purchaseDate);
+                    } else {
+                        Equipment updatedEquipment = new Equipment(currentEquipment.getEquipmentId(), roomId, name,
+                                model, status, purchaseDate);
                         return equipmentDAO.updateEquipment(updatedEquipment);
                     }
                 }

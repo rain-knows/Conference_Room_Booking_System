@@ -35,6 +35,8 @@ public class MainPage extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH); // 设置为全屏
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        // 设置主背景色
+        getContentPane().setBackground(new Color(240, 245, 250));
 
         // 初始化普通用户按钮
         btnHome = new JButton("主页");
@@ -52,39 +54,72 @@ public class MainPage extends JFrame {
         // 美化所有侧边栏按钮
         JButton[] navButtons = { btnHome, btnRoomStatus, btnMyBookings, btnProfile, btnAdminRoomMgmt, btnAdminUserMgmt,
                 btnAdminSettings, btnAdminEquipmentMgmt, btnLogout };
+        Color mainColor = new Color(52, 152, 219);
+        Color hoverColor = new Color(41, 128, 185);
         for (JButton btn : navButtons) {
             if (btn == null)
                 continue;
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
+            btn.setBackground(mainColor);
+            btn.setForeground(Color.WHITE);
+            btn.setFont(new Font("微软雅黑", Font.BOLD, 16));
             btn.setFocusPainted(false);
-            btn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+            btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
             btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
             btn.setHorizontalAlignment(SwingConstants.CENTER); // 横向居中
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(hoverColor);
+                }
+
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(mainColor);
+                }
+            });
         }
+        // 退出按钮特殊色
+        btnLogout.setBackground(new Color(220, 53, 69));
+        btnLogout.setFont(new Font("微软雅黑", Font.BOLD, 16));
+        btnLogout.setHorizontalAlignment(SwingConstants.CENTER); // 横向居中
+        btnLogout.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnLogout.setBackground(new Color(200, 35, 51));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnLogout.setBackground(new Color(220, 53, 69));
+            }
+        });
 
         lblNavigationTitle = new JLabel("导航菜单");
-        lblNavigationTitle.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        lblNavigationTitle.setFont(new Font("微软雅黑", Font.BOLD, 20)); // 更大更醒目
+        lblNavigationTitle.setForeground(new Color(41, 128, 185));
         lblNavigationTitle.setHorizontalAlignment(SwingConstants.CENTER); // 横向居中
 
         contentPanel = new JPanel();
+        contentPanel.setBackground(Color.WHITE);
         contentPanel.setLayout(new BorderLayout());
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
+        // 增加内容区内边距和圆角
+        contentPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(20, 20, 20, 20),
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true)));
         // 初始显示会议室状态界面
+        // showContent("会议室状态界面"); // 调用此方法来初始化界面，而不是直接添加JLabel
+        // 为了演示，我们先添加一个通用的欢迎标签，实际应由showContent处理
         JLabel welcomeLabel = new JLabel("欢迎使用会议室预订系统", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 18));
+        welcomeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 20));
         contentPanel.add(welcomeLabel, BorderLayout.CENTER);
 
         // 设置布局 - 左右分栏
         setLayout(new MigLayout("", "[200px][grow]", "[grow]"));
 
-        // 侧边栏
+        // "gap unrel" 表示组件间的默认间隙
+        // "insets 10" 增加侧边栏的内边距
         JPanel sidebar = new JPanel(
-                new MigLayout("wrap 1, fillx, insets 10", "[grow,fill]"));
-        sidebar.add(lblNavigationTitle, "align center, gaptop 5, gapbottom 15");
-
+                new MigLayout("wrap 1, fillx, insets 10", "[grow,fill]")); // Simplified layout definition
+        sidebar.setBackground(new Color(230, 235, 240)); // 浅灰色背景
+        sidebar.add(lblNavigationTitle, "align center, gaptop 5, gapbottom 15"); // 调整标题间
         // 添加导航按钮到侧边栏 (User Group)
-        sidebar.add(btnHome, "growx, h 40!");
+        sidebar.add(btnHome, "growx, h 40!"); // 主页按钮放在最上面
         sidebar.add(btnRoomStatus, "growx, h 40!, gaptop 5");
         sidebar.add(btnMyBookings, "growx, h 40!, gaptop 5");
         sidebar.add(btnProfile, "growx, h 40!, gaptop 5");
@@ -94,15 +129,14 @@ public class MainPage extends JFrame {
 
         // 管理员功能按钮 - 根据角色判断是否添加和显示 (Admin Group)
         if (currentUser.isAdmin()) {
-            sidebar.add(btnAdminRoomMgmt, "growx, h 40!");
+            sidebar.add(btnAdminRoomMgmt, "growx, h 40!"); // No large gaptop needed now
             sidebar.add(btnAdminEquipmentMgmt, "growx, h 40!, gaptop 5");
             sidebar.add(btnAdminUserMgmt, "growx, h 40!, gaptop 5");
             sidebar.add(btnAdminSettings, "growx, h 40!, gaptop 5");
         }
 
         // 将退出按钮推到底部
-        sidebar.add(btnLogout, "growx, h 40!, dock south");
-
+        sidebar.add(btnLogout, "growx, h 40!, dock south"); // Dock to the absolute bottom
         // 添加组件到窗口
         add(sidebar, "grow");
         add(contentPanel, "grow");
@@ -180,7 +214,8 @@ public class MainPage extends JFrame {
                 break;
             default:
                 JLabel defaultLabel = new JLabel("未找到对应界面: " + panelKey, SwingConstants.CENTER);
-                defaultLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
+                defaultLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+                defaultLabel.setForeground(Color.RED);
                 newPanelToShow = new JPanel(new BorderLayout());
                 newPanelToShow.add(defaultLabel, BorderLayout.CENTER);
                 break;

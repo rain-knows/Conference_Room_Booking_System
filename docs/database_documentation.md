@@ -2,7 +2,7 @@
 
 ## 1. 概述
 
-本文档详细描述了会议室预订管理系统的数据库结构。该数据库旨在有效管理用户信息、会议室资源、设备以及相关的预订流程。系统采用关系型数据库模型，通过外键约束保证数据的一致性和完整性。
+本文档详细描述了会议室预订管理系统的数据库结构。该数据库旨在有效管理用户信息、会议室资源、设备以及相关的预订流程。系统采用关系型数据库模型，通过外键约束保证数据的一致性和完整性。系统还实现了基于字段映射的权限管理机制，通过用户角色和会议室类型的组合来控制访问权限。
 
 **数据库名**: `conference_room_booking`
 **字符集**: `utf8mb4`
@@ -63,10 +63,24 @@ erDiagram
         date purchaseDate "购买日期"
     }
 
+    PermissionMapping {
+        int mappingId PK "映射ID"
+        varchar(50) userRole "用户角色"
+        varchar(20) roomTypeCode "会议室类型代码"
+        boolean canBook "可预订"
+        boolean canView "可查看"
+        boolean canManage "可管理"
+        varchar(255) description "权限描述"
+        datetime createTime "创建时间"
+        datetime updateTime "更新时间"
+    }
+
     User ||--o{ Reservation : "发起"
     MeetingRoom ||--o{ Reservation : "被预订"
     MeetingRoom ||--o{ Equipment : "包含"
     RoomType ||--o{ MeetingRoom : "属于"
+    User ||--o{ PermissionMapping : "角色映射"
+    RoomType ||--o{ PermissionMapping : "类型映射"
 ```
 
 ## 3. 表结构详情
@@ -90,7 +104,7 @@ erDiagram
 
 ### 3.2 `RoomType` (会议室类型表)
 
-定义会议室的分类，例如普通会议室、VIP会议室等。
+定义会议室的分类，例如基础会议室、高级会议室、VIP会议室等。
 
 | 字段名 | 数据类型 | 约束 | 默认值 | 注释 |
 |---|---|---|---|---|
@@ -149,4 +163,94 @@ erDiagram
 | `description`| `TEXT` | `NULL` | `NULL` | 会议的详细描述或备注 |
 | `status` | `INT` | `NULL` | `NULL` | 预订状态 (1: 已确认, 2: 已取消, 3: 进行中, 4: 已完成) |
 | `createdTime`| `DATETIME` | `NOT NULL` | `CURRENT_TIMESTAMP` | 预订记录的创建时间 |
-```
+
+---
+
+### 3.6 `PermissionMapping` (权限映射表)
+
+存储用户角色和会议室类型的权限映射关系，实现基于字段映射的权限控制。
+
+| 字段名 | 数据类型 | 约束 | 默认值 | 注释 |
+|---|---|---|---|---|
+| `mappingId` | `INT` | `PRIMARY KEY`, `AUTO_INCREMENT` | | 权限映射唯一标识符 |
+| `userRole` | `VARCHAR(50)` | `NOT NULL` | | 用户角色 (NORMAL_EMPLOYEE, LEADER, SYSTEM_ADMIN) |
+| `roomTypeCode` | `VARCHAR(20)` | `NOT NULL` | | 会议室类型代码 |
+| `canBook` | `BOOLEAN` | `NOT NULL` | `FALSE` | 是否可以预订该类型会议室 |
+| `canView` | `BOOLEAN` | `NOT NULL` | `FALSE` | 是否可以查看该类型会议室 |
+| `canManage` | `BOOLEAN` | `NOT NULL` | `FALSE` | 是否可以管理该类型会议室 |
+| `description` | `VARCHAR(255)` | `NULL` | `NULL` | 权限配置的描述信息 |
+| `createTime` | `DATETIME` | `NOT NULL` | `CURRENT_TIMESTAMP` | 记录创建时间 |
+| `updateTime` | `DATETIME` | `NOT NULL` | `CURRENT_TIMESTAMP` on update | 记录最后更新时间 |
+
+**索引**:
+- `UNIQUE KEY uk_user_role_room_type (userRole, roomTypeCode)` - 确保每个角色对每种会议室类型只有一条权限记录
+- `INDEX idx_user_role (userRole)` - 优化按用户角色查询权限
+- `INDEX idx_room_type_code (roomTypeCode)` - 优化按会议室类型查询权限
+
+## 4. 权限系统说明
+
+### 4.1 权限模型
+
+系统采用基于字段映射的权限模型，通过以下三个维度控制访问权限：
+
+1. **用户角色** (`User.role`): NORMAL_EMPLOYEE, LEADER, SYSTEM_ADMIN
+2. **会议室类型** (`RoomType.typeCode`): BASIC, PREMIUM, VIP
+3. **权限类型**: 查看(canView), 预订(canBook), 管理(canManage)
+
+### 4.2 默认权限配置
+
+| 用户角色 | 基础会议室 | 高级会议室 | VIP会议室 |
+|---------|-----------|-----------|-----------|
+| SYSTEM_ADMIN | 完全管理 | 完全管理 | 完全管理 |
+| LEADER | 可预订查看 | 可预订查看 | 可预订查看 |
+| NORMAL_EMPLOYEE | 可预订查看 | 仅查看 | 无权限 |
+
+### 4.3 权限检查流程
+
+1. **会议室列表加载**: 只显示用户有权限查看的会议室
+2. **预订按钮状态**: 根据用户权限和会议室状态动态启用/禁用
+3. **预订操作验证**: 在预订前再次检查用户权限
+4. **管理权限检查**: 在管理操作前验证用户权限
+
+## 5. 数据完整性约束
+
+### 5.1 外键约束
+
+- `MeetingRoom.roomTypeId` → `RoomType.roomTypeId`
+- `MeetingRoom.roomId` → `Equipment.roomId`
+- `User.userId` → `Reservation.userId`
+- `MeetingRoom.roomId` → `Reservation.roomId`
+
+### 5.2 唯一性约束
+
+- `User.username` - 用户名唯一
+- `User.email` - 邮箱唯一
+- `RoomType.typeCode` - 会议室类型代码唯一
+- `PermissionMapping(userRole, roomTypeCode)` - 角色类型组合唯一
+
+### 5.3 检查约束
+
+- `User.role` - 只能是预定义的角色值
+- `MeetingRoom.status` - 会议室状态值范围
+- `Equipment.status` - 设备状态值范围
+- `Reservation.status` - 预订状态值范围
+
+## 6. 性能优化建议
+
+### 6.1 索引策略
+
+- 为频繁查询的字段添加索引
+- 为外键关系添加索引
+- 为权限检查查询优化索引
+
+### 6.2 查询优化
+
+- 使用适当的JOIN查询
+- 避免N+1查询问题
+- 考虑使用视图简化复杂查询
+
+### 6.3 数据维护
+
+- 定期清理过期数据
+- 监控表大小和查询性能
+- 定期备份权限配置数据
