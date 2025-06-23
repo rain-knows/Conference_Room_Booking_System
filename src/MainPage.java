@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 主页面，包含导航菜单和内容区域。
@@ -28,108 +30,105 @@ public class MainPage extends JFrame {
     private JButton btnLogout;
     private JLabel lblNavigationTitle;
 
+    // 面板Key常量
+    private static final String PANEL_HOME = "主页界面";
+    private static final String PANEL_ROOM_STATUS = "会议室状态界面";
+    private static final String PANEL_BOOK_ROOM = "预订会议室界面";
+    private static final String PANEL_MY_BOOKINGS = "我的预订界面";
+    private static final String PANEL_PROFILE = "个人信息界面";
+    private static final String PANEL_ADMIN_ROOM_MGMT = "会议室管理界面 (管理员)";
+    private static final String PANEL_ADMIN_USER_MGMT = "用户管理界面 (管理员)";
+    private static final String PANEL_ADMIN_EQUIPMENT_MGMT = "设备管理界面 (管理员)";
+    private static final String PANEL_ADMIN_SETTINGS = "系统设置界面 (管理员)";
+
+    // 按钮与面板key映射
+    private final Map<JButton, String> buttonPanelMap = new HashMap<>();
+
     public MainPage(User user) {
         this.currentUser = user; // 保存用户
-        // 设置窗口属性
         setTitle("会议室预订系统");
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // 设置为全屏
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // 初始化普通用户按钮
-        btnHome = new JButton("主页");
-        btnRoomStatus = new JButton("会议室状态");
-        btnMyBookings = new JButton("我的预订");
-        btnProfile = new JButton("个人信息");
-
-        // 初始化管理员按钮
-        btnAdminRoomMgmt = new JButton("会议室管理");
-        btnAdminUserMgmt = new JButton("用户管理");
-        btnAdminSettings = new JButton("系统设置");
-        btnAdminEquipmentMgmt = new JButton("设备管理");
-        btnLogout = new JButton("退出登录");
-
-        // 美化所有侧边栏按钮
-        JButton[] navButtons = { btnHome, btnRoomStatus, btnMyBookings, btnProfile, btnAdminRoomMgmt, btnAdminUserMgmt,
-                btnAdminSettings, btnAdminEquipmentMgmt, btnLogout };
-        for (JButton btn : navButtons) {
-            if (btn == null)
-                continue;
-            btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
-            btn.setFocusPainted(false);
-            btn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-            btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btn.setHorizontalAlignment(SwingConstants.CENTER); // 横向居中
-        }
-
-        lblNavigationTitle = new JLabel("导航菜单");
-        lblNavigationTitle.setFont(new Font("微软雅黑", Font.BOLD, 18));
-        lblNavigationTitle.setHorizontalAlignment(SwingConstants.CENTER); // 横向居中
-
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        // 初始显示会议室状态界面
-        JLabel welcomeLabel = new JLabel("欢迎使用会议室预订系统", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 18));
-        contentPanel.add(welcomeLabel, BorderLayout.CENTER);
-
+        // 初始化按钮
+        initButtons();
+        // 初始化按钮与面板映射
+        initButtonPanelMap();
         // 设置布局 - 左右分栏
         setLayout(new MigLayout("", "[200px][grow]", "[grow]"));
 
-        // 侧边栏
-        JPanel sidebar = new JPanel(
-                new MigLayout("wrap 1, fillx, insets 10", "[grow,fill]"));
-        sidebar.add(lblNavigationTitle, "align center, gaptop 5, gapbottom 15");
+        // 初始化侧边栏
+        JPanel sidebar = initSidebar();
+        // 初始化内容区
+        contentPanel = initContentPanel();
 
-        // 添加导航按钮到侧边栏 (User Group)
-        sidebar.add(btnHome, "growx, h 40!");
-        sidebar.add(btnRoomStatus, "growx, h 40!, gaptop 5");
-        sidebar.add(btnMyBookings, "growx, h 40!, gaptop 5");
-        sidebar.add(btnProfile, "growx, h 40!, gaptop 5");
-
-        // This "pusher" component will create the space between the two groups.
-        sidebar.add(new JLabel(), "pushy");
-
-        // 管理员功能按钮 - 根据角色判断是否添加和显示 (Admin Group)
-        if (currentUser.isAdmin()) {
-            sidebar.add(btnAdminRoomMgmt, "growx, h 40!");
-            sidebar.add(btnAdminEquipmentMgmt, "growx, h 40!, gaptop 5");
-            sidebar.add(btnAdminUserMgmt, "growx, h 40!, gaptop 5");
-            sidebar.add(btnAdminSettings, "growx, h 40!, gaptop 5");
-        }
-
-        // 将退出按钮推到底部
-        sidebar.add(btnLogout, "growx, h 40!, dock south");
-
-        // 添加组件到窗口
         add(sidebar, "grow");
         add(contentPanel, "grow");
 
-        // 为普通用户按钮添加事件监听器
-        btnHome.addActionListener(e -> showContent("主页界面"));
-        btnRoomStatus.addActionListener(e -> showContent("会议室状态界面"));
-        btnMyBookings.addActionListener(e -> showContent("我的预订界面"));
-        btnProfile.addActionListener(e -> showContent("个人信息界面"));
-
-        // 为管理员按钮添加事件监听器
-        btnAdminRoomMgmt.addActionListener(e -> showContent("会议室管理界面 (管理员)"));
-        btnAdminUserMgmt.addActionListener(e -> showContent("用户管理界面 (管理员)"));
-        btnAdminEquipmentMgmt.addActionListener(e -> showContent("设备管理界面 (管理员)"));
-        btnAdminSettings.addActionListener(e -> showContent("系统设置界面 (管理员)"));
+        // 注册所有按钮事件
+        registerButtonActions();
         btnLogout.addActionListener(e -> {
-            // 实际的退出登录逻辑
             int confirmation = JOptionPane.showConfirmDialog(this, "您确定要退出登录吗？", "退出确认", JOptionPane.YES_NO_OPTION);
             if (confirmation == JOptionPane.YES_OPTION) {
-                dispose(); // 关闭当前主界面
-                // 返回登录界面
+                dispose();
                 SwingUtilities.invokeLater(() -> new LoginForm().setVisible(true));
             }
         });
+        showContent(PANEL_HOME);
+    }
 
-        // 初始化时显示默认界面，例如会议室状态
-        showContent("主页界面");
+    /**
+     * 初始化所有按钮并设置样式
+     */
+    private void initButtons() {
+        btnHome = createNavButton("主页");
+        btnRoomStatus = createNavButton("会议室状态");
+        btnMyBookings = createNavButton("我的预订");
+        btnProfile = createNavButton("个人信息");
+        btnAdminRoomMgmt = createNavButton("会议室管理");
+        btnAdminUserMgmt = createNavButton("用户管理");
+        btnAdminSettings = createNavButton("系统设置");
+        btnAdminEquipmentMgmt = createNavButton("设备管理");
+        btnLogout = createNavButton("退出登录");
+    }
+
+    /**
+     * 创建并美化导航按钮
+     */
+    private JButton createNavButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setHorizontalAlignment(SwingConstants.CENTER);
+        return btn;
+    }
+
+    /**
+     * 初始化按钮与面板key的映射
+     */
+    private void initButtonPanelMap() {
+        buttonPanelMap.put(btnHome, PANEL_HOME);
+        buttonPanelMap.put(btnRoomStatus, PANEL_ROOM_STATUS);
+        buttonPanelMap.put(btnMyBookings, PANEL_MY_BOOKINGS);
+        buttonPanelMap.put(btnProfile, PANEL_PROFILE);
+        if (currentUser.isAdmin()) {
+            buttonPanelMap.put(btnAdminRoomMgmt, PANEL_ADMIN_ROOM_MGMT);
+            buttonPanelMap.put(btnAdminEquipmentMgmt, PANEL_ADMIN_EQUIPMENT_MGMT);
+            buttonPanelMap.put(btnAdminUserMgmt, PANEL_ADMIN_USER_MGMT);
+            buttonPanelMap.put(btnAdminSettings, PANEL_ADMIN_SETTINGS);
+        }
+    }
+
+    /**
+     * 注册所有导航按钮的事件
+     */
+    private void registerButtonActions() {
+        for (Map.Entry<JButton, String> entry : buttonPanelMap.entrySet()) {
+            entry.getKey().addActionListener(e -> showContent(entry.getValue()));
+        }
     }
 
     /**
@@ -144,31 +143,31 @@ public class MainPage extends JFrame {
 
         // 根据 panelKey 创建并加载相应的 JPanel
         switch (panelKey) {
-            case "主页界面":
+            case PANEL_HOME:
                 newPanelToShow = new HomePanel(this::showContent);
                 break;
-            case "会议室状态界面":
-            case "预订会议室界面":
+            case PANEL_ROOM_STATUS:
+            case PANEL_BOOK_ROOM:
                 newPanelToShow = new RoomStatusPanel(currentUser);
                 break;
-            case "我的预订界面":
+            case PANEL_MY_BOOKINGS:
                 newPanelToShow = new MyBookingsPanel(currentUser);
                 break;
-            case "个人信息界面":
+            case PANEL_PROFILE:
                 newPanelToShow = new UserProfilePanel(currentUser);
                 break;
-            case "会议室管理界面 (管理员)":
+            case PANEL_ADMIN_ROOM_MGMT:
                 newPanelToShow = new AdminRoomManagementPanel();
                 break;
-            case "用户管理界面 (管理员)":
+            case PANEL_ADMIN_USER_MGMT:
                 newPanelToShow = new AdminUserManagementPanel(currentUser);
                 break;
-            case "设备管理界面 (管理员)":
+            case PANEL_ADMIN_EQUIPMENT_MGMT:
                 if (currentUser.isAdmin()) {
                     newPanelToShow = new AdminEquipmentManagementPanel();
                 }
                 break;
-            case "系统设置界面 (管理员)":
+            case PANEL_ADMIN_SETTINGS:
                 if (currentUser.isAdmin()) {
                     newPanelToShow = new AdminSettingsPanel(currentUser);
                 } else {
@@ -192,5 +191,42 @@ public class MainPage extends JFrame {
 
         contentPanel.revalidate(); // 使更改生效
         contentPanel.repaint(); // 重绘面板
+    }
+
+    /**
+     * 初始化侧边栏
+     */
+    private JPanel initSidebar() {
+        JPanel sidebar = new JPanel(new MigLayout("wrap 1, fillx, insets 10", "[grow,fill]"));
+        lblNavigationTitle = new JLabel("导航菜单");
+        lblNavigationTitle.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        lblNavigationTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        sidebar.add(lblNavigationTitle, "align center, gaptop 5, gapbottom 15");
+        sidebar.add(btnHome, "growx, h 40!");
+        sidebar.add(btnRoomStatus, "growx, h 40!, gaptop 5");
+        sidebar.add(btnMyBookings, "growx, h 40!, gaptop 5");
+        sidebar.add(btnProfile, "growx, h 40!, gaptop 5");
+        sidebar.add(new JLabel(), "pushy");
+        if (currentUser.isAdmin()) {
+            sidebar.add(btnAdminRoomMgmt, "growx, h 40!");
+            sidebar.add(btnAdminEquipmentMgmt, "growx, h 40!, gaptop 5");
+            sidebar.add(btnAdminUserMgmt, "growx, h 40!, gaptop 5");
+            sidebar.add(btnAdminSettings, "growx, h 40!, gaptop 5");
+        }
+        sidebar.add(btnLogout, "growx, h 40!, dock south");
+        return sidebar;
+    }
+
+    /**
+     * 初始化内容区
+     */
+    private JPanel initContentPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JLabel welcomeLabel = new JLabel("欢迎使用会议室预订系统", SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 18));
+        panel.add(welcomeLabel, BorderLayout.CENTER);
+        return panel;
     }
 }

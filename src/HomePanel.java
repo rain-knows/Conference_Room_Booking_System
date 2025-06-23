@@ -181,7 +181,7 @@ public class HomePanel extends JPanel {
     private void openBooking() {
         // 假设有一个专门的预订界面，如果主页的 "预订会议室" 按钮应该直接跳转到
         // 会议室状态列表让用户选择，则可以复用 openRoomStatus
-        navigateTo("预订会议室界面"); // TODO: 确保MainPage中有名为 "预订会议室界面" 的case
+        navigateTo("预订会议室界面");
     }
 
     private void openProfile() {

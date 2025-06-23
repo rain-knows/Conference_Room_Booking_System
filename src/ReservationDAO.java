@@ -172,9 +172,4 @@ public class ReservationDAO {
         }
     }
 
-    // TODO: 根据需要可以添加其他与 Reservation 表相关的 CRUD 操作，例如：
-    // - createReservation(Map<String, Object> reservationData)
-    // - updateReservation(Map<String, Object> reservationData)
-    // - deleteReservation(int reservationId)
-    // - getReservationById(int reservationId)
 }
