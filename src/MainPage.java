@@ -23,10 +23,7 @@ public class MainPage extends JFrame {
     private JButton btnRoomStatus;
     private JButton btnMyBookings;
     private JButton btnProfile;
-    private JButton btnAdminRoomMgmt;
-    private JButton btnAdminUserMgmt;
     private JButton btnAdminSettings;
-    private JButton btnAdminEquipmentMgmt;
     private JButton btnLogout;
     private JLabel lblNavigationTitle;
 
@@ -36,9 +33,6 @@ public class MainPage extends JFrame {
     private static final String PANEL_BOOK_ROOM = "预订会议室界面";
     private static final String PANEL_MY_BOOKINGS = "我的预订界面";
     private static final String PANEL_PROFILE = "个人信息界面";
-    private static final String PANEL_ADMIN_ROOM_MGMT = "会议室管理界面 (管理员)";
-    private static final String PANEL_ADMIN_USER_MGMT = "用户管理界面 (管理员)";
-    private static final String PANEL_ADMIN_EQUIPMENT_MGMT = "设备管理界面 (管理员)";
     private static final String PANEL_ADMIN_SETTINGS = "系统设置界面 (管理员)";
 
     // 按钮与面板key映射
@@ -86,10 +80,7 @@ public class MainPage extends JFrame {
         btnRoomStatus = createNavButton("会议室状态");
         btnMyBookings = createNavButton("我的预订");
         btnProfile = createNavButton("个人信息");
-        btnAdminRoomMgmt = createNavButton("会议室管理");
-        btnAdminUserMgmt = createNavButton("用户管理");
         btnAdminSettings = createNavButton("系统设置");
-        btnAdminEquipmentMgmt = createNavButton("设备管理");
         btnLogout = createNavButton("退出登录");
     }
 
@@ -115,9 +106,6 @@ public class MainPage extends JFrame {
         buttonPanelMap.put(btnMyBookings, PANEL_MY_BOOKINGS);
         buttonPanelMap.put(btnProfile, PANEL_PROFILE);
         if (currentUser.isAdmin()) {
-            buttonPanelMap.put(btnAdminRoomMgmt, PANEL_ADMIN_ROOM_MGMT);
-            buttonPanelMap.put(btnAdminEquipmentMgmt, PANEL_ADMIN_EQUIPMENT_MGMT);
-            buttonPanelMap.put(btnAdminUserMgmt, PANEL_ADMIN_USER_MGMT);
             buttonPanelMap.put(btnAdminSettings, PANEL_ADMIN_SETTINGS);
         }
     }
@@ -156,22 +144,10 @@ public class MainPage extends JFrame {
             case PANEL_PROFILE:
                 newPanelToShow = new UserProfilePanel(currentUser);
                 break;
-            case PANEL_ADMIN_ROOM_MGMT:
-                newPanelToShow = new AdminRoomManagementPanel();
-                break;
-            case PANEL_ADMIN_USER_MGMT:
-                newPanelToShow = new AdminUserManagementPanel(currentUser);
-                break;
-            case PANEL_ADMIN_EQUIPMENT_MGMT:
-                if (currentUser.isAdmin()) {
-                    newPanelToShow = new AdminEquipmentManagementPanel();
-                }
-                break;
             case PANEL_ADMIN_SETTINGS:
                 if (currentUser.isAdmin()) {
                     newPanelToShow = new AdminSettingsPanel(currentUser);
                 } else {
-                    // Fallback for non-admin users, though they shouldn't see the button
                     JPanel accessDeniedPanel = new JPanel(new GridBagLayout());
                     accessDeniedPanel.add(new JLabel("您没有权限访问此页面。"));
                     newPanelToShow = accessDeniedPanel;
@@ -208,9 +184,6 @@ public class MainPage extends JFrame {
         sidebar.add(btnProfile, "growx, h 40!, gaptop 5");
         sidebar.add(new JLabel(), "pushy");
         if (currentUser.isAdmin()) {
-            sidebar.add(btnAdminRoomMgmt, "growx, h 40!");
-            sidebar.add(btnAdminEquipmentMgmt, "growx, h 40!, gaptop 5");
-            sidebar.add(btnAdminUserMgmt, "growx, h 40!, gaptop 5");
             sidebar.add(btnAdminSettings, "growx, h 40!, gaptop 5");
         }
         sidebar.add(btnLogout, "growx, h 40!, dock south");
