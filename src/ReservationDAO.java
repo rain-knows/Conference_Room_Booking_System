@@ -172,4 +172,40 @@ public class ReservationDAO {
         }
     }
 
+    /**
+     * 根据会议室ID获取该会议室的所有预订记录
+     * 
+     * @param roomId 会议室ID
+     * @return 预订记录列表
+     * @throws SQLException 数据库访问异常
+     */
+    public List<Reservation> getReservationsByRoomId(int roomId) throws SQLException {
+        List<Reservation> reservations = new ArrayList<>();
+        String sql = "SELECT r.reservationId, r.userId, r.roomId, m.name AS roomName, r.subject, r.description, r.startTime, r.endTime, r.status "
+                +
+                "FROM Reservation r " +
+                "JOIN MeetingRoom m ON r.roomId = m.roomId " +
+                "WHERE r.roomId = ? " +
+                "ORDER BY r.startTime ASC";
+        try (Connection conn = UserDAO.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, roomId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int reservationId = rs.getInt("reservationId");
+                    int userId = rs.getInt("userId");
+                    String roomName = rs.getString("roomName");
+                    String subject = rs.getString("subject");
+                    String description = rs.getString("description");
+                    Timestamp startTime = rs.getTimestamp("startTime");
+                    Timestamp endTime = rs.getTimestamp("endTime");
+                    int status = rs.getInt("status");
+                    reservations.add(new Reservation(reservationId, userId, roomId, roomName, subject, description,
+                            startTime, endTime, status));
+                }
+            }
+        }
+        return reservations;
+    }
+
 }

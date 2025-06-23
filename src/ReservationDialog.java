@@ -6,6 +6,14 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Consumer;
+import java.util.List;
+import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
 
 public class ReservationDialog extends JDialog {
 
@@ -22,6 +30,8 @@ public class ReservationDialog extends JDialog {
     private JSpinner endDateSpinner;
     private JSpinner endTimeSpinner;
     private boolean saved = false;
+
+    private List<Reservation> occupiedReservations = new ArrayList<>(); // 新增：存储已被占用的时间段
 
     public ReservationDialog(Frame owner, User currentUser, MeetingRoom room, Reservation reservation,
             Consumer<Boolean> onSaveCallback) {
@@ -49,6 +59,21 @@ public class ReservationDialog extends JDialog {
         JLabel roomInfoLabel = new JLabel("会议室: " + room.getName() + " (" + room.getLocation() + ")");
         roomInfoLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         add(roomInfoLabel, "span 4, center, wrap, gapbottom 15");
+
+        // 新增：显示已被占用的时间段
+        JLabel occupiedLabel = new JLabel("已被占用的时间段：");
+        occupiedLabel.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        add(occupiedLabel, "span 4, left, wrap, gapbottom 5");
+        JTextArea occupiedArea = new JTextArea();
+        occupiedArea.setEditable(false);
+        occupiedArea.setFont(new Font("微软雅黑", Font.PLAIN, 13));
+        occupiedArea.setBackground(getBackground());
+        occupiedArea.setBorder(null);
+        occupiedArea.setLineWrap(true);
+        occupiedArea.setWrapStyleWord(true);
+        JScrollPane occupiedScroll = new JScrollPane(occupiedArea);
+        occupiedScroll.setPreferredSize(new Dimension(500, 60));
+        add(occupiedScroll, "span 4, growx, wrap, gapbottom 10");
 
         // Components with better styling
         subjectField = new JTextField();
@@ -130,6 +155,48 @@ public class ReservationDialog extends JDialog {
         setMinimumSize(new Dimension(600, 450));
         setResizable(true);
         setLocationRelativeTo(getOwner());
+
+        // 异步加载已被占用的时间段
+        new SwingWorker<List<Reservation>, Void>() {
+            @Override
+            protected List<Reservation> doInBackground() throws Exception {
+                // 只查找当前会议室，且是未来的、未取消的预约
+                List<Reservation> all = reservationDAO.getReservationsByRoomId(room.getRoomId());
+                List<Reservation> filtered = new ArrayList<>();
+                long now = System.currentTimeMillis();
+                for (Reservation r : all) {
+                    if (r.getStatus() != Reservation.STATUS_CANCELLED && r.getEndTime().getTime() > now) {
+                        // 排除当前正在编辑的预约
+                        if (currentReservation == null
+                                || r.getReservationId() != currentReservation.getReservationId()) {
+                            filtered.add(r);
+                        }
+                    }
+                }
+                return filtered;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    occupiedReservations = get();
+                    if (occupiedReservations.isEmpty()) {
+                        occupiedArea.setText("无");
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        for (Reservation r : occupiedReservations) {
+                            sb.append(sdf.format(r.getStartTime())).append(" ~ ")
+                                    .append(sdf.format(r.getEndTime())).append("  ")
+                                    .append(r.getSubject() != null ? r.getSubject() : "").append("\n");
+                        }
+                        occupiedArea.setText(sb.toString());
+                    }
+                } catch (Exception e) {
+                    occupiedArea.setText("加载失败");
+                }
+            }
+        }.execute();
     }
 
     private void populateData() {
