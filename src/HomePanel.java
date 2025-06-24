@@ -52,33 +52,46 @@ public class HomePanel extends JPanel {
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
 
         // 初始化标签以便后续更新
-        totalRoomsLabel = new JLabel("0");
-        availableRoomsLabel = new JLabel("0");
-        todayBookingsLabel = new JLabel("0");
+        totalRoomsLabel = createStatValueLabel();
+        availableRoomsLabel = createStatValueLabel();
+        todayBookingsLabel = createStatValueLabel();
 
-        // 添加统计卡片
-        addStatCard("总会议室数", totalRoomsLabel);
-        addStatCard("可用会议室", availableRoomsLabel);
-        addStatCard("今日预订", todayBookingsLabel);
+        // 添加统计卡片（带图标和颜色）
+        addStatCard("总会议室数", totalRoomsLabel, UIManager.getIcon("OptionPane.informationIcon"), new Color(0x4F8EF7));
+        addStatCard("可用会议室", availableRoomsLabel, UIManager.getIcon("OptionPane.questionIcon"), new Color(0x43B581));
+        addStatCard("今日预订", todayBookingsLabel, UIManager.getIcon("OptionPane.warningIcon"), new Color(0xF7B84F));
     }
 
-    private void addStatCard(String title, JLabel valueLabel) {
+    // 创建更醒目的数字标签
+    private JLabel createStatValueLabel() {
+        JLabel label = new JLabel("加载中...");
+        label.setFont(new Font("微软雅黑", Font.BOLD, 32));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        return label;
+    }
+
+    // 新增：带图标和颜色的统计卡片
+    private void addStatCard(String title, JLabel valueLabel, Icon icon, Color bgColor) {
         JPanel card = new JPanel(new MigLayout("wrap 1, insets 10", "[grow]", "[]"));
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
+                BorderFactory.createLineBorder(bgColor.darker(), 2, true),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         card.setOpaque(true);
-        card.setPreferredSize(new Dimension(0, 80));
+        card.setBackground(bgColor);
+        card.setPreferredSize(new Dimension(0, 100));
+
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        card.add(iconLabel);
+
+        valueLabel.setForeground(Color.WHITE);
+        card.add(valueLabel);
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        titleLabel.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+        titleLabel.setForeground(new Color(255, 255, 255, 220));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        valueLabel.setFont(new Font("微软雅黑", Font.BOLD, 24));
-        valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
         card.add(titleLabel);
-        card.add(valueLabel);
 
         statsPanel.add(card, "grow");
     }
@@ -94,31 +107,50 @@ public class HomePanel extends JPanel {
         titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
         quickActionsPanel.add(titleLabel, "span 2, wrap, gapbottom 15");
 
-        // 快速操作按钮
-        addQuickActionButton("新建预订", "快速预订可用的会议室", e -> openBooking());
-        addQuickActionButton("查看会议室状态", "查看所有会议室的当前状态和可用性", e -> openRoomStatus());
-        addQuickActionButton("我的预订", "查看和管理您的会议室预订", e -> openMyBookings());
-        addQuickActionButton("个人信息", "查看和修改您的个人信息", e -> openProfile());
+        // 快速操作按钮（带图标）
+        addQuickActionButton("新建预订", "快速预订可用的会议室", UIManager.getIcon("FileView.fileIcon"), e -> openBooking());
+        addQuickActionButton("查看会议室状态", "查看所有会议室的当前状态和可用性", UIManager.getIcon("FileView.directoryIcon"),
+                e -> openRoomStatus());
+        addQuickActionButton("我的预订", "查看和管理您的会议室预订", UIManager.getIcon("FileView.hardDriveIcon"),
+                e -> openMyBookings());
+        addQuickActionButton("个人信息", "查看和修改您的个人信息", UIManager.getIcon("FileView.computerIcon"), e -> openProfile());
     }
 
-    private void addQuickActionButton(String title, String description, ActionListener action) {
-        JPanel buttonPanel = new JPanel(new MigLayout("wrap 1, insets 15", "[grow]", "[]"));
+    // 新增：带图标的快速操作按钮
+    private void addQuickActionButton(String title, String description, Icon icon, ActionListener action) {
+        JPanel buttonPanel = new JPanel(new MigLayout("wrap 1, insets 10", "[grow]", "[]"));
         buttonPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(UIManager.getColor("Panel.border"), 1, true),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        buttonPanel.setOpaque(false);
 
-        JButton button = new JButton(title);
-        button.setFont(new Font("微软雅黑", Font.BOLD, 14));
+        JButton button = new JButton(title, icon);
+        button.setFont(new Font("微软雅黑", Font.BOLD, 16));
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        button.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.setVerticalTextPosition(SwingConstants.BOTTOM);
+        button.setIconTextGap(8);
         button.addActionListener(action);
+        // 鼠标悬停高亮
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(0xE6F7FF));
+                button.setOpaque(true);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(UIManager.getColor("Button.background"));
+                button.setOpaque(false);
+            }
+        });
 
         JLabel descLabel = new JLabel(description);
         descLabel.setFont(new Font("微软雅黑", Font.PLAIN, 12));
         descLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        buttonPanel.add(button, "growx, gapbottom 10");
+        buttonPanel.add(button, "growx, gapbottom 8");
         buttonPanel.add(descLabel, "growx");
 
         quickActionsPanel.add(buttonPanel, "grow");
@@ -126,6 +158,9 @@ public class HomePanel extends JPanel {
 
     private void loadHomeData() {
         // 使用SwingWorker异步加载统计数据
+        totalRoomsLabel.setText("加载中...");
+        availableRoomsLabel.setText("加载中...");
+        todayBookingsLabel.setText("加载中...");
         SwingWorker<List<Integer>, Void> worker = new SwingWorker<>() {
             @Override
             protected List<Integer> doInBackground() throws Exception {
@@ -181,7 +216,7 @@ public class HomePanel extends JPanel {
     private void openBooking() {
         // 假设有一个专门的预订界面，如果主页的 "预订会议室" 按钮应该直接跳转到
         // 会议室状态列表让用户选择，则可以复用 openRoomStatus
-        navigateTo("预订会议室界面"); // TODO: 确保MainPage中有名为 "预订会议室界面" 的case
+        navigateTo("预订会议室界面");
     }
 
     private void openProfile() {

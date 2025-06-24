@@ -59,6 +59,11 @@ public class AdminSettingsPanel extends JPanel {
         // 密码管理选项卡
         tabbedPane.addTab("密码管理", createPasswordManagementPanel());
 
+        // 新增：会议室管理、设备管理、用户管理
+        tabbedPane.addTab("会议室管理", new AdminRoomManagementPanel());
+        tabbedPane.addTab("设备管理", new AdminEquipmentManagementPanel());
+        tabbedPane.addTab("用户管理", new AdminUserManagementPanel(currentUser));
+
         // 权限管理选项卡
         tabbedPane.addTab("权限管理", createPermissionManagementPanel());
 

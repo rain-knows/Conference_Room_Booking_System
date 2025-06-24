@@ -15,7 +15,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.util.Vector;
 import java.text.SimpleDateFormat;
@@ -29,18 +28,17 @@ import javax.swing.event.PopupMenuListener;
 public class RoomStatusPanel extends JPanel {
 
     private final User currentUser;
-    private JTable roomTable;
-    private DefaultTableModel tableModel;
     private final MeetingRoomDAO meetingRoomDAO;
     private final EquipmentDAO equipmentDAO;
     private List<MeetingRoomDAO.MeetingRoomStatusDTO> roomStatusList; // Full list from DB
 
-    private JButton bookButton;
-    private JButton detailsButton;
-
     // Filter components
     private JPopupMenu statusFilterMenu;
     private String currentStatusFilter = "全部";
+    private JButton filterButton;
+
+    private JPanel cardPanel; // 新增：用于放置会议室卡片的面板
+    private JScrollPane cardScrollPane; // 新增：卡片面板的滚动容器
 
     public RoomStatusPanel(User user) {
         this.currentUser = user;
@@ -51,33 +49,13 @@ public class RoomStatusPanel extends JPanel {
     }
 
     private void initComponents() {
-        setLayout(new MigLayout("fill, insets 20", "[grow][]", "[][grow]"));
+        setLayout(new MigLayout("fill, insets 20", "[][grow]", "[]20[grow]"));
 
         JLabel titleLabel = new JLabel("会议室状态");
         titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
-        add(titleLabel, "span, wrap, gapbottom 15");
+        add(titleLabel, "align left");
 
-        // Table
-        String[] columnNames = { "ID", "会议室名称", "状态", "当前会议", "预订时间" };
-        tableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        roomTable = new JTable(tableModel);
-        roomTable.setRowHeight(28);
-        roomTable.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        roomTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
-        roomTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        roomTable.getColumn("状态").setCellRenderer(new StatusCellRenderer());
-        roomTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                updateButtonState();
-            }
-        });
-
-        // 表头筛选弹出菜单
+        // 筛选菜单
         statusFilterMenu = new JPopupMenu();
         String[] statusOptions = { "全部", "空闲", "使用中", "维护中", "已停用" };
         for (String status : statusOptions) {
@@ -89,52 +67,19 @@ public class RoomStatusPanel extends JPanel {
             });
             statusFilterMenu.add(item);
         }
+        filterButton = new JButton("筛选: " + currentStatusFilter + " ▼");
+        filterButton.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        filterButton.addActionListener(e -> statusFilterMenu.show(filterButton, 0, filterButton.getHeight()));
+        add(filterButton, "align right, wrap");
 
-        JTableHeader header = roomTable.getTableHeader();
-        // 自定义表头渲染器，状态列加下拉箭头
-        header.setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
-            JLabel lbl = new JLabel();
-            lbl.setFont(header.getFont());
-            lbl.setHorizontalAlignment(SwingConstants.CENTER);
-            lbl.setOpaque(true);
-            lbl.setBackground(header.getBackground());
-            if (column == 2) {
-                lbl.setText("状态 ▼");
-            } else {
-                lbl.setText(value.toString());
-            }
-            return lbl;
-        });
-
-        header.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                int col = roomTable.columnAtPoint(e.getPoint());
-                if (col == 2) { // 状态列
-                    statusFilterMenu.show(header, e.getX(), header.getHeight());
-                }
-            }
-        });
-
-        add(new JScrollPane(roomTable), "grow, push");
-
-        // Button Panel
-        JPanel buttonPanel = new JPanel(new MigLayout("wrap 1, fillx", "[grow, fill]"));
-        detailsButton = new JButton("查看详情");
-        bookButton = new JButton("预约会议室");
-
-        detailsButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        bookButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-
-        detailsButton.addActionListener(e -> showSelectedRoomDetails());
-        bookButton.addActionListener(e -> bookSelectedRoom());
-
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(detailsButton, "gaptop 10");
-        buttonPanel.add(bookButton, "gaptop 10");
-        add(buttonPanel, "top");
-
-        updateButtonState(); // Initial state
+        // 卡片面板布局优化，固定三列，居中显示
+        cardPanel = new JPanel();
+        cardPanel.setLayout(new net.miginfocom.swing.MigLayout("wrap 3, gap 24 24, align center top",
+                "[grow,fill][grow,fill][grow,fill]", ""));
+        cardPanel.setOpaque(false);
+        cardScrollPane = new JScrollPane(cardPanel);
+        cardScrollPane.setBorder(null);
+        add(cardScrollPane, "grow, push, span 2");
     }
 
     private void applyFilters() {
@@ -142,33 +87,307 @@ public class RoomStatusPanel extends JPanel {
             return;
         }
         String selectedStatus = currentStatusFilter;
+        List<MeetingRoomDAO.MeetingRoomStatusDTO> filteredList;
         if (selectedStatus == null || selectedStatus.equals("全部")) {
-            updateTableModel(roomStatusList);
-            return;
+            filteredList = roomStatusList;
+        } else {
+            filteredList = roomStatusList.stream()
+                    .filter(dto -> selectedStatus.equals(dto.getStatus()))
+                    .collect(Collectors.toList());
         }
-        List<MeetingRoomDAO.MeetingRoomStatusDTO> filteredList = roomStatusList.stream()
-                .filter(dto -> selectedStatus.equals(dto.getStatus()))
-                .collect(Collectors.toList());
-        updateTableModel(filteredList);
+        updateCardPanel(filteredList);
     }
 
-    private void updateTableModel(List<MeetingRoomDAO.MeetingRoomStatusDTO> dtoList) {
-        tableModel.setRowCount(0);
-        if (dtoList == null)
-            return;
-        for (var dto : dtoList) {
-            Vector<Object> row = new Vector<>();
-            row.add(dto.getRoomId());
-            row.add(dto.getRoomName());
-            row.add(dto.getStatus());
-            row.add(dto.getCurrentBookingSubject() != null ? dto.getCurrentBookingSubject() : "—");
-            row.add(dto.getCurrentBookingTime() != null && !dto.getCurrentBookingTime().isEmpty()
-                    ? dto.getCurrentBookingTime()
-                    : "—");
-            tableModel.addRow(row);
+    private void updateCardPanel(List<MeetingRoomDAO.MeetingRoomStatusDTO> dtoList) {
+        cardPanel.removeAll();
+        if (dtoList == null || dtoList.isEmpty()) {
+            JLabel emptyLabel = new JLabel("暂无会议室");
+            emptyLabel.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+            cardPanel.add(emptyLabel, "span, center");
+        } else {
+            for (MeetingRoomDAO.MeetingRoomStatusDTO dto : dtoList) {
+                cardPanel.add(createRoomCard(dto), "grow");
+            }
         }
-        // After updating table, selection is lost, so buttons should be disabled.
-        updateButtonState();
+        cardPanel.revalidate();
+        cardPanel.repaint();
+    }
+
+    private JPanel createRoomCard(MeetingRoomDAO.MeetingRoomStatusDTO dto) {
+        JPanel card = new JPanel(new BorderLayout());
+        // 使用UIManager获取主题色
+        final Color borderColor = UIManager.getColor("Separator.foreground");
+        final Color bgColor = UIManager.getColor("Panel.background");
+        final Color titleColor = UIManager.getColor("Label.foreground");
+        final Color infoColor = UIManager.getColor("Label.foreground");
+        final Color subInfoColor = UIManager.getColor("Label.disabledForeground");
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(borderColor != null ? borderColor : Color.GRAY, 2, true),
+                new EmptyBorder(16, 20, 16, 20)));
+        card.setBackground(bgColor != null ? bgColor : Color.WHITE);
+
+        // 标题区
+        JLabel nameLabel = new JLabel(dto.getRoomName() + " (ID: " + dto.getRoomId() + ")");
+        nameLabel.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        nameLabel.setForeground(titleColor != null ? titleColor : Color.BLACK);
+        card.add(nameLabel, BorderLayout.NORTH);
+
+        // 信息区（异步加载更多详情）
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setOpaque(false);
+
+        // 先展示基础信息
+        infoPanel.add(makeInfoLine("状态:", dto.getStatus(), infoColor != null ? infoColor : Color.DARK_GRAY));
+        infoPanel.add(
+                makeInfoLine("当前会议:", dto.getCurrentBookingSubject() != null ? dto.getCurrentBookingSubject() : "—",
+                        infoColor != null ? infoColor : Color.DARK_GRAY));
+        infoPanel.add(makeInfoLine("预订时间:",
+                dto.getCurrentBookingTime() != null && !dto.getCurrentBookingTime().isEmpty()
+                        ? dto.getCurrentBookingTime()
+                        : "—",
+                infoColor != null ? infoColor : Color.DARK_GRAY));
+        infoPanel.add(Box.createVerticalStrut(6));
+        infoPanel.add(new JSeparator());
+
+        // 异步加载详细信息
+        new SwingWorker<MeetingRoom, Void>() {
+            @Override
+            protected MeetingRoom doInBackground() throws Exception {
+                return meetingRoomDAO.getMeetingRoomByIdWithType(dto.getRoomId());
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    MeetingRoom room = get();
+                    if (room != null) {
+                        infoPanel.add(makeInfoLine("容量:", room.getCapacity() + "人",
+                                subInfoColor != null ? subInfoColor : Color.GRAY));
+                        infoPanel.add(makeInfoLine("位置:", room.getLocation(),
+                                subInfoColor != null ? subInfoColor : Color.GRAY));
+                        infoPanel.add(makeInfoLine("类型:", room.getRoomTypeCode() != null ? room.getRoomTypeCode() : "—",
+                                subInfoColor != null ? subInfoColor : Color.GRAY));
+                        infoPanel.add(makeInfoLine("描述:",
+                                room.getDescription() != null && !room.getDescription().isEmpty()
+                                        ? room.getDescription()
+                                        : "—",
+                                subInfoColor != null ? subInfoColor : Color.GRAY));
+                        // 异步加载设备
+                        new SwingWorker<List<Equipment>, Void>() {
+                            @Override
+                            protected List<Equipment> doInBackground() throws Exception {
+                                return equipmentDAO.getEquipmentByRoomId(dto.getRoomId());
+                            }
+
+                            @Override
+                            protected void done() {
+                                try {
+                                    List<Equipment> eqs = get();
+                                    if (eqs != null && !eqs.isEmpty()) {
+                                        StringBuilder eqStr = new StringBuilder();
+                                        for (int i = 0; i < Math.min(3, eqs.size()); i++) {
+                                            eqStr.append(eqs.get(i).getName());
+                                            if (i < Math.min(3, eqs.size()) - 1)
+                                                eqStr.append("，");
+                                        }
+                                        if (eqs.size() > 3)
+                                            eqStr.append("...");
+                                        infoPanel.add(makeInfoLine("主要设备:", eqStr.toString(),
+                                                subInfoColor != null ? subInfoColor : Color.GRAY));
+                                    } else {
+                                        infoPanel.add(makeInfoLine("主要设备:", "无",
+                                                subInfoColor != null ? subInfoColor : Color.GRAY));
+                                    }
+                                    infoPanel.revalidate();
+                                    infoPanel.repaint();
+                                } catch (Exception ignore) {
+                                }
+                            }
+                        }.execute();
+                    }
+                    infoPanel.revalidate();
+                    infoPanel.repaint();
+                } catch (Exception ignore) {
+                }
+            }
+        }.execute();
+
+        card.add(infoPanel, BorderLayout.CENTER);
+
+        // 按钮区
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        btnPanel.setOpaque(false);
+        JButton detailsBtn = new JButton("查看详情");
+        JButton bookBtn = new JButton("预约会议室");
+        detailsBtn.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        bookBtn.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        detailsBtn.addActionListener(e -> showRoomDetailsById(dto.getRoomId()));
+        bookBtn.addActionListener(e -> bookRoomById(dto.getRoomId(), dto.getStatus()));
+        btnPanel.add(detailsBtn);
+        btnPanel.add(bookBtn);
+        card.add(btnPanel, BorderLayout.SOUTH);
+
+        updateBookButtonState(bookBtn, dto.getRoomId(), dto.getStatus());
+        return card;
+    }
+
+    private JPanel makeInfoLine(String label, String value, Color fg) {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        p.setOpaque(false);
+        JLabel l1 = new JLabel(label);
+        l1.setForeground(fg);
+        l1.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        JLabel l2 = new JLabel(value);
+        l2.setForeground(fg);
+        l2.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+        p.add(l1);
+        p.add(Box.createHorizontalStrut(6));
+        p.add(l2);
+        return p;
+    }
+
+    private void showRoomDetailsById(int roomId) {
+        class RoomDetails {
+            final MeetingRoom room;
+            final List<Equipment> equipmentList;
+
+            RoomDetails(MeetingRoom room, List<Equipment> equipmentList) {
+                this.room = room;
+                this.equipmentList = equipmentList;
+            }
+        }
+        new SwingWorker<RoomDetails, Void>() {
+            @Override
+            protected RoomDetails doInBackground() throws Exception {
+                MeetingRoom room = meetingRoomDAO.getMeetingRoomById(roomId);
+                if (room != null) {
+                    List<Equipment> equipment = equipmentDAO.getEquipmentByRoomId(roomId);
+                    return new RoomDetails(room, equipment);
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    RoomDetails details = get();
+                    if (details != null && details.room != null) {
+                        StringBuilder htmlBuilder = new StringBuilder(
+                                "<html><body style='width: 300px; padding: 5px;'>");
+                        htmlBuilder.append("<h2>").append(details.room.getName()).append("</h2>");
+                        htmlBuilder.append("<p><b>位置:</b> ").append(details.room.getLocation()).append("</p>");
+                        htmlBuilder.append("<p><b>容量:</b> ").append(details.room.getCapacity()).append("人</p>");
+                        htmlBuilder.append("<p><b>状态:</b> ").append(details.room.getStatusText()).append("</p>");
+                        htmlBuilder.append("<p><b>描述:</b> ")
+                                .append(details.room.getDescription().isEmpty() ? "无" : details.room.getDescription())
+                                .append("</p>");
+                        htmlBuilder.append("<hr>");
+                        htmlBuilder.append("<h3>设备列表</h3>");
+                        if (details.equipmentList.isEmpty()) {
+                            htmlBuilder.append("<p>此会议室没有配置任何设备。</p>");
+                        } else {
+                            htmlBuilder.append("<table width='100%' border='0' cellspacing='0' cellpadding='2'>");
+                            htmlBuilder.append("<tr><th>设备名称</th><th>型号</th><th>状态</th></tr>");
+                            for (Equipment eq : details.equipmentList) {
+                                htmlBuilder.append("<tr>");
+                                htmlBuilder.append("<td>").append(eq.getName()).append("</td>");
+                                htmlBuilder.append("<td>").append(eq.getModel() != null ? eq.getModel() : "N/A")
+                                        .append("</td>");
+                                htmlBuilder.append("<td>").append(eq.getStatusText()).append("</td>");
+                                htmlBuilder.append("</tr>");
+                            }
+                            htmlBuilder.append("</table>");
+                        }
+                        htmlBuilder.append("</body></html>");
+                        JEditorPane editorPane = new JEditorPane("text/html", htmlBuilder.toString());
+                        editorPane.setEditable(false);
+                        editorPane.setBackground(UIManager.getColor("Panel.background"));
+                        JScrollPane scrollPane = new JScrollPane(editorPane);
+                        scrollPane.setPreferredSize(new Dimension(450, 300));
+                        JOptionPane.showMessageDialog(RoomStatusPanel.this, scrollPane, "会议室详情",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(RoomStatusPanel.this, "无法获取会议室详情。", "错误",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(RoomStatusPanel.this, "获取详情失败: " + e.getMessage(), "错误",
+                            JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                }
+            }
+        }.execute();
+    }
+
+    private void bookRoomById(int roomId, String status) {
+        new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return meetingRoomDAO.canUserBookRoom(currentUser.getRole(), roomId);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    boolean canBook = get();
+                    if (!canBook) {
+                        JOptionPane.showMessageDialog(RoomStatusPanel.this, "您没有权限预订此会议室。", "无法预约",
+                                JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    new SwingWorker<MeetingRoom, Void>() {
+                        @Override
+                        protected MeetingRoom doInBackground() throws Exception {
+                            return meetingRoomDAO.getMeetingRoomByIdWithType(roomId);
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                MeetingRoom roomToBook = get();
+                                if (roomToBook != null) {
+                                    ReservationDialog dialog = new ReservationDialog(
+                                            (Frame) SwingUtilities.getWindowAncestor(RoomStatusPanel.this),
+                                            currentUser, roomToBook, null, (saved) -> {
+                                                if (saved) {
+                                                    loadRoomStatus();
+                                                }
+                                            });
+                                    dialog.setVisible(true);
+                                }
+                            } catch (Exception e) {
+                                JOptionPane.showMessageDialog(RoomStatusPanel.this, "无法打开预订窗口: " + e.getMessage(), "错误",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }.execute();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(RoomStatusPanel.this, "权限检查失败: " + e.getMessage(), "错误",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
+    }
+
+    private void updateBookButtonState(JButton bookBtn, int roomId, String status) {
+        bookBtn.setEnabled(false);
+        new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return meetingRoomDAO.canUserBookRoom(currentUser.getRole(), roomId);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    boolean canBook = get();
+                    bookBtn.setEnabled(canBook);
+                } catch (Exception e) {
+                    bookBtn.setEnabled(false);
+                }
+            }
+        }.execute();
     }
 
     private void loadRoomStatus() {
@@ -204,169 +423,6 @@ public class RoomStatusPanel extends JPanel {
                 } catch (Exception e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(RoomStatusPanel.this, "加载会议室状态失败: " + e.getMessage(), "错误",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }.execute();
-    }
-
-    private void updateButtonState() {
-        int selectedRow = roomTable.getSelectedRow();
-        if (selectedRow == -1) {
-            detailsButton.setEnabled(false);
-            bookButton.setEnabled(false);
-        } else {
-            detailsButton.setEnabled(true);
-            String status = (String) tableModel.getValueAt(selectedRow, 2);
-            int roomId = (int) tableModel.getValueAt(selectedRow, 0);
-
-            // 检查用户是否有权限预订此会议室
-            new SwingWorker<Boolean, Void>() {
-                @Override
-                protected Boolean doInBackground() throws Exception {
-                    return meetingRoomDAO.canUserBookRoom(currentUser.getRole(), roomId);
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        boolean canBook = get();
-                        // 只有用户有权限预订且会议室状态为空闲时才启用预订按钮
-                        bookButton.setEnabled("空闲".equals(status) && canBook);
-                    } catch (Exception e) {
-                        // 如果权限检查失败，默认禁用预订按钮
-                        bookButton.setEnabled(false);
-                    }
-                }
-            }.execute();
-        }
-    }
-
-    private void showSelectedRoomDetails() {
-        int selectedRow = roomTable.getSelectedRow();
-        if (selectedRow == -1)
-            return;
-
-        int roomId = (int) tableModel.getValueAt(selectedRow, 0);
-
-        // Define a structure to hold both room and equipment data
-        class RoomDetails {
-            final MeetingRoom room;
-            final List<Equipment> equipmentList;
-
-            RoomDetails(MeetingRoom room, List<Equipment> equipmentList) {
-                this.room = room;
-                this.equipmentList = equipmentList;
-            }
-        }
-
-        new SwingWorker<RoomDetails, Void>() {
-            @Override
-            protected RoomDetails doInBackground() throws Exception {
-                MeetingRoom room = meetingRoomDAO.getMeetingRoomById(roomId);
-                if (room != null) {
-                    List<Equipment> equipment = equipmentDAO.getEquipmentByRoomId(roomId);
-                    return new RoomDetails(room, equipment);
-                }
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    RoomDetails details = get();
-                    if (details != null && details.room != null) {
-                        StringBuilder htmlBuilder = new StringBuilder(
-                                "<html><body style='width: 300px; padding: 5px;'>");
-                        htmlBuilder.append("<h2>").append(details.room.getName()).append("</h2>");
-                        htmlBuilder.append("<p><b>位置:</b> ").append(details.room.getLocation()).append("</p>");
-                        htmlBuilder.append("<p><b>容量:</b> ").append(details.room.getCapacity()).append("人</p>");
-                        htmlBuilder.append("<p><b>状态:</b> ").append(details.room.getStatusText()).append("</p>");
-                        htmlBuilder.append("<p><b>描述:</b> ")
-                                .append(details.room.getDescription().isEmpty() ? "无" : details.room.getDescription())
-                                .append("</p>");
-                        htmlBuilder.append("<hr>");
-                        htmlBuilder.append("<h3>设备列表</h3>");
-
-                        if (details.equipmentList.isEmpty()) {
-                            htmlBuilder.append("<p>此会议室没有配置任何设备。</p>");
-                        } else {
-                            htmlBuilder.append("<table width='100%' border='0' cellspacing='0' cellpadding='2'>");
-                            htmlBuilder.append("<tr><th>设备名称</th><th>型号</th><th>状态</th></tr>");
-                            for (Equipment eq : details.equipmentList) {
-                                htmlBuilder.append("<tr>");
-                                htmlBuilder.append("<td>").append(eq.getName()).append("</td>");
-                                htmlBuilder.append("<td>").append(eq.getModel() != null ? eq.getModel() : "N/A")
-                                        .append("</td>");
-                                htmlBuilder.append("<td>").append(eq.getStatusText()).append("</td>");
-                                htmlBuilder.append("</tr>");
-                            }
-                            htmlBuilder.append("</table>");
-                        }
-
-                        htmlBuilder.append("</body></html>");
-
-                        JEditorPane editorPane = new JEditorPane("text/html", htmlBuilder.toString());
-                        editorPane.setEditable(false);
-                        editorPane.setBackground(UIManager.getColor("Panel.background"));
-
-                        JScrollPane scrollPane = new JScrollPane(editorPane);
-                        scrollPane.setPreferredSize(new Dimension(450, 300));
-
-                        JOptionPane.showMessageDialog(RoomStatusPanel.this, scrollPane, "会议室详情",
-                                JOptionPane.INFORMATION_MESSAGE);
-
-                    } else {
-                        JOptionPane.showMessageDialog(RoomStatusPanel.this, "无法获取会议室详情。", "错误",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(RoomStatusPanel.this, "获取详情失败: " + e.getMessage(), "错误",
-                            JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
-                }
-            }
-        }.execute();
-    }
-
-    private void bookSelectedRoom() {
-        int selectedRow = roomTable.getSelectedRow();
-        if (selectedRow == -1)
-            return;
-
-        int roomId = (int) tableModel.getValueAt(selectedRow, 0);
-
-        new SwingWorker<MeetingRoom, Void>() {
-            @Override
-            protected MeetingRoom doInBackground() throws Exception {
-                // 首先检查用户是否有权限预订此会议室
-                boolean canBook = meetingRoomDAO.canUserBookRoom(currentUser.getRole(), roomId);
-                if (!canBook) {
-                    throw new SecurityException("您没有权限预订此类型的会议室。");
-                }
-
-                return meetingRoomDAO.getMeetingRoomByIdWithType(roomId);
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    MeetingRoom roomToBook = get();
-                    if (roomToBook != null) {
-                        ReservationDialog dialog = new ReservationDialog(
-                                (Frame) SwingUtilities.getWindowAncestor(RoomStatusPanel.this),
-                                currentUser, roomToBook, null, (saved) -> {
-                                    if (saved) {
-                                        loadRoomStatus(); // Refresh on successful booking
-                                    }
-                                });
-                        dialog.setVisible(true);
-                    }
-                } catch (SecurityException e) {
-                    JOptionPane.showMessageDialog(RoomStatusPanel.this, e.getMessage(), "权限不足",
-                            JOptionPane.WARNING_MESSAGE);
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(RoomStatusPanel.this, "无法打开预订窗口: " + e.getMessage(), "错误",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
