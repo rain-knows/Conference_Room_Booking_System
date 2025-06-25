@@ -1,8 +1,8 @@
 public class User {
     private int userId;
     private String username;
-    private String password; // It's better to not store raw password here in a real app
-    private String role; // e.g., "NORMAL_EMPLOYEE", "LEADER", "SYSTEM_ADMIN"
+    private String password; 
+    private String role; // "NORMAL_EMPLOYEE", "LEADER", "SYSTEM_ADMIN"
     private String email;
     private String phone;
     private boolean active; // 账户是否激活
