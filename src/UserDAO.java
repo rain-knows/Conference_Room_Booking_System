@@ -239,15 +239,50 @@ public class UserDAO {
      * @throws SQLException 数据库访问异常
      */
     public boolean deleteUser(int userId) throws SQLException {
-        // 警告: 在生产环境中，直接删除用户可能导致外键约束问题（如他们的预订记录）。
-        // 更好的做法可能是将用户标记为 "deactivated"。
-        // 为简化起见，这里执行硬删除。
-        String sql = "DELETE FROM user WHERE userId = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false); // 开启事务
+            
+            // 首先删除用户相关的预订记录
+            String deleteReservationsSql = "DELETE FROM reservation WHERE userId = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteReservationsSql)) {
+                pstmt.setInt(1, userId);
+                pstmt.executeUpdate();
+            }
+            
+            // 然后删除用户记录
+            String deleteUserSql = "DELETE FROM user WHERE userId = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteUserSql)) {
+                pstmt.setInt(1, userId);
+                int affectedRows = pstmt.executeUpdate();
+                
+                if (affectedRows > 0) {
+                    conn.commit(); // 提交事务
+                    return true;
+                } else {
+                    conn.rollback(); // 回滚事务
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // 发生异常时回滚事务
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw e; // 重新抛出异常
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // 恢复自动提交
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

@@ -240,33 +240,7 @@ public class AdminSettingsPanel extends JPanel {
                 currentThemeValue.setText(selectedTheme.getDisplayName());
             }
         });
-        panel.add(themeComboBox, "growx, wrap, gapbottom 20");
-
-        JLabel fontLabel = new JLabel("字体设置:");
-        fontLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-        panel.add(fontLabel);
-
-        JPanel fontPanel = new JPanel(new MigLayout("", "[][][]", "[]"));
-        fontPanel.setOpaque(false);
-
-        JLabel fontSizeLabel = new JLabel("字体大小:");
-        fontSizeLabel.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
-        JSpinner fontSizeSpinner = new JSpinner(new SpinnerNumberModel(14, 10, 20, 1));
-        fontSizeSpinner.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-
-        JButton applyFontButton = new JButton("应用字体");
-        applyFontButton.setFont(new Font("微软雅黑", Font.BOLD, 14));
-        applyFontButton.addActionListener(e -> {
-            int fontSize = (Integer) fontSizeSpinner.getValue();
-            UIStyleUtil.setGlobalFont("微软雅黑", fontSize);
-        });
-
-        fontPanel.add(fontSizeLabel);
-        fontPanel.add(fontSizeSpinner);
-        fontPanel.add(applyFontButton);
-
-        panel.add(fontPanel, "growx");
+        panel.add(themeComboBox, "growx, wrap");
 
         return panel;
     }

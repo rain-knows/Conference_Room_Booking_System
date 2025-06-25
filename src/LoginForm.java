@@ -9,9 +9,8 @@ import java.sql.SQLException;
 import javax.swing.UIManager;
 
 /**
- * A modern, redesigned login form for the Conference Room Booking System.
  * 
- * @author JUSTLIKEZYP (Redesigned by AI Assistant)
+ * @author JUSTLIKEZYP 
  */
 public class LoginForm extends JFrame {
     // ====== 常量定义 ======
